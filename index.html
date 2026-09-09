@@ -43,7 +43,7 @@
             --border-color: #243247;
             --sidebar-bg: #0d1524;
             --sidebar-panel: rgba(0,0,0,0.25);
-            --input-bg: rgba(0,0,0,0.25);
+            --input-bg: rgba(0,0,0,0.2);
             --input-border: #2d3d54;
             --text-light: #e2e8f0;
             --table-header: #1a263a;
@@ -99,7 +99,7 @@
             text-align: center; line-height: 1.5;
         }
 
-        /* ===== MODAL DE ADMIN ===== */
+        /* ===== MODAL DE ADMIN (NOVO USUÁRIO) ===== */
         .admin-modal-overlay {
             position: fixed; inset: 0; z-index: 99998;
             background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
@@ -231,7 +231,7 @@
         .chart-container { position: relative; height: 320px; width: 100%; }
         .chart-container.map { height: 580px; border-radius: 10px; overflow: hidden; background: #c8d3db; position: relative; }
 
-        /* MOLDURA FLUTUANTE DO MAPA (DIREITA) */
+        /* ===== MOLDURA FLUTUANTE DO MAPA (DIREITA - ABAIXO DO ZOOM) ===== */
         .map-floating-right {
             position: absolute; top: 85px; right: 12px; z-index: 1000;
             background: rgba(255,255,255,0.92); backdrop-filter: blur(10px);
@@ -480,6 +480,7 @@
                         Cavalheiro<span style="color:var(--brand-orange)">log</span>
                     </div>
                 </div>
+                <!-- BOTÃO DISCRETO DE TEMA -->
                 <button class="theme-icon-btn" id="themeToggle" title="Alternar Modo Escuro">🌙</button>
             </div>
             
@@ -1680,6 +1681,7 @@
             tbody.innerHTML = rows || `<tr><td colspan="4" class="text-center" style="padding:30px; color:var(--text-muted);">Nenhum dado pendente nesta aba.</td></tr>`;
         }
 
+        // RENDERIZAÇÃO DA ABA ATIVA (COM PROTEÇÃO ABSOLUTA DE CANVAS)
         function renderActiveTab() {
             const activeTab = document.querySelector('.nav-tab.active');
             if (!activeTab) return;
@@ -1840,6 +1842,7 @@
             }
         });
 
+        // Abas
         document.getElementById('navTabs').addEventListener('click', e => {
             if(e.target.closest('.nav-tab')){
                 document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
@@ -1849,6 +1852,7 @@
             }
         });
 
+        // Filtros da Tabela de Postos
         document.querySelectorAll('.period-btn[data-filter]').forEach(b => b.addEventListener('click', function(){
             document.querySelectorAll('.period-btn[data-filter]').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active'); 
@@ -1867,6 +1871,7 @@
             renderStationsTable();
         });
 
+        // Filtros do Mapa
         document.querySelectorAll('.map-pill-btn[data-mapfilter]').forEach(b => b.addEventListener('click', function(){
             document.querySelectorAll('.map-pill-btn[data-mapfilter]').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active'); 
@@ -1887,6 +1892,7 @@
             }
         });
 
+        // Filtros de Integração
         document.querySelectorAll('.period-btn[data-integration]').forEach(b => b.addEventListener('click', function(){
             document.querySelectorAll('.period-btn[data-integration]').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active'); 
@@ -1894,6 +1900,7 @@
             renderIntegration(this.dataset.integration);
         }));
 
+        // Filtros da Evolução
         document.querySelectorAll('.period-btn[data-period]').forEach(b => b.addEventListener('click', function(){
             document.querySelectorAll('.period-btn[data-period]').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active'); 
@@ -1920,7 +1927,7 @@
             inInicio.value = localStorage.getItem('cavalheiro_dtIni') || strHoje;
             inFim.value = localStorage.getItem('cavalheiro_dtFim') || strHoje;
 
-            document.getElementById('globalMessageArea').innerHTML = '<div class="error-container" style="border-color: var(--border-color); color: var(--text-muted);">👆 Selecione o período desejado e clique em <b>"FILTRAR"</b> para consultar os dados da frota.</div>';
+            document.getElementById('globalMessageArea').innerHTML = '<div class="error-container" style="border-color: var(--border-color); color: var(--text-muted);">👆 Configure o período desejado e clique em <b>"FILTRAR"</b> para consultar os dados da frota.</div>';
         };
     </script>
 </body>
