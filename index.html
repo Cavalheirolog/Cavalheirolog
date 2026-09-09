@@ -93,14 +93,13 @@
         .auth-alert.error { display: block; background: rgba(220,53,69,0.1); color: var(--danger); border: 1px solid rgba(220,53,69,0.3); }
         .auth-alert.success { display: block; background: rgba(40,167,69,0.1); color: var(--success); border: 1px solid rgba(40,167,69,0.3); }
 
-        /* Card de 2FA */
         .box-2fa-info {
             background: var(--bg-color); border: 1px dashed var(--brand-orange);
             padding: 12px; border-radius: 8px; font-size: 11px; color: var(--text-main);
             text-align: center; line-height: 1.5;
         }
 
-        /* ===== MODAL DE ADMIN (NOVO USUÁRIO) ===== */
+        /* ===== MODAL DE ADMIN ===== */
         .admin-modal-overlay {
             position: fixed; inset: 0; z-index: 99998;
             background: rgba(0,0,0,0.65); backdrop-filter: blur(4px);
@@ -161,10 +160,8 @@
         .header-left { display: flex; align-items: center; gap: 14px; }
         .open-sidebar-btn { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); font-size: 13px; cursor: pointer; padding: 7px 12px; border-radius: 6px; font-weight: 700; display: none; align-items: center; gap: 5px; }
         
-        /* LOGO AUMENTADA */
         .header-logo img { height: 56px; object-fit: contain; }
 
-        /* BOTAO DE TEMA DISCRETO */
         .theme-icon-btn {
             background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main);
             width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -207,7 +204,7 @@
             color: #fff; box-shadow: 0 4px 12px rgba(54,73,93,0.3);
         }
 
-        /* KPIs COM TOOLTIPS EXPLICATIVOS */
+        /* KPIs COM CURSOR HELP E TOOLTIPS */
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .kpi-card {
             background: var(--surface-color); border-radius: 10px; padding: 16px;
@@ -234,7 +231,7 @@
         .chart-container { position: relative; height: 320px; width: 100%; }
         .chart-container.map { height: 580px; border-radius: 10px; overflow: hidden; background: #c8d3db; position: relative; }
 
-        /* ===== MOLDURA FLUTUANTE DO MAPA (DIREITA - ABAIXO DO ZOOM) ===== */
+        /* MOLDURA FLUTUANTE DO MAPA (DIREITA) */
         .map-floating-right {
             position: absolute; top: 85px; right: 12px; z-index: 1000;
             background: rgba(255,255,255,0.92); backdrop-filter: blur(10px);
@@ -276,7 +273,7 @@
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         thead { background: var(--table-header); position: sticky; top: 0; z-index: 5; }
-        th { padding: 11px; font-weight: 700; color: var(--text-main); border-bottom: 2px solid var(--border-color); white-space: nowrap; text-transform: uppercase; }
+        th { padding: 11px; font-weight: 700; color: var(--text-main); border-bottom: 2px solid var(--border-color); white-space: nowrap; text-transform: uppercase; cursor: help; }
         td { padding: 10px 11px; border-bottom: 1px solid var(--border-color); color: var(--text-main); }
         tr:hover td { background: var(--table-hover); }
 
@@ -331,7 +328,7 @@
             </div>
             <div class="auth-title">Segurança em Duas Etapas</div>
             <div class="box-2fa-info" id="box2faInfo">
-                Um código temporário de 6 dígitos foi enviado para o e-mail de segurança do administrador.
+                Um código temporário de 6 dígitos foi gerado para a sua sessão.
             </div>
             <div class="auth-alert" id="alert2FA"></div>
 
@@ -483,7 +480,6 @@
                         Cavalheiro<span style="color:var(--brand-orange)">log</span>
                     </div>
                 </div>
-                <!-- BOTÃO DISCRETO DE TEMA -->
                 <button class="theme-icon-btn" id="themeToggle" title="Alternar Modo Escuro">🌙</button>
             </div>
             
@@ -561,11 +557,11 @@
                     <table>
                         <thead>
                             <tr>
-                                <th class="text-left" title="Data ou Período agrupado">Data / Período</th>
-                                <th class="text-right" title="Volume total de litros abastecidos no dia/período">Volume (L)</th>
-                                <th class="text-right" title="Cálculo: Gasto Total ÷ Volume do Dia = Preço Médio Praticado">Preço Médio Praticado</th>
-                                <th class="text-right" title="Cálculo: Soma dos valores totais pagos na bomba">Gasto Total</th>
-                                <th class="text-right" title="Cálculo: (Preço Referência - Preço Médio) × Volume. Positivo = Economia real; Negativo = Custo acima do negociado">Economia Real (vs Ref.)</th>
+                                <th class="text-left" title="Data ou período agrupado">Data / Período</th>
+                                <th class="text-right" title="Fórmula: Soma do volume em litros (∑ Litros) abastecidos no dia">Volume (L)</th>
+                                <th class="text-right" title="Fórmula: Gasto Total ÷ Volume do Dia = Preço Médio Praticado por Litro">Preço Médio Praticado</th>
+                                <th class="text-right" title="Fórmula: Soma dos valores brutos pagos na bomba">Gasto Total</th>
+                                <th class="text-right" title="Fórmula: (Preço Referência - Preço Médio) × Volume. Positivo = Economia real; Negativo = Custo acima do negociado">Economia Real (vs Ref.)</th>
                             </tr>
                         </thead>
                         <tbody id="periodTableBody"></tbody>
@@ -608,15 +604,15 @@
                     <table>
                         <thead>
                             <tr>
-                                <th class="text-left">Rank</th>
-                                <th class="text-left">Posto Atendido</th>
-                                <th class="text-left">Cidade/UF</th>
-                                <th class="text-center">Tipo</th>
-                                <th class="text-center" title="Quantidade de caminhões distintos atendidos neste posto">Veículos</th>
+                                <th class="text-left" title="Classificação por volume abastecido">Rank</th>
+                                <th class="text-left" title="Nome fantasia ou razão social do estabelecimento credenciado">Posto Atendido</th>
+                                <th class="text-left" title="Município e Estado de localização">Cidade/UF</th>
+                                <th class="text-center" title="Interno = Bomba própria de garagem; Externo = Rede credenciada em rodovia">Tipo</th>
+                                <th class="text-center" title="Quantidade de placas de veículos distintos atendidos">Veículos</th>
                                 <th class="text-right" title="Volume total de combustível abastecido neste posto">Volume (L)</th>
-                                <th class="text-right" title="Cálculo: Custo Total ÷ Volume = Preço Médio Pago por Litro">Preço Médio</th>
-                                <th class="text-right" title="Cálculo: Soma de todos os valores brutos pagos no posto">Custo Total</th>
-                                <th class="text-right" title="Cálculo: (Preço Referência - Preço Médio) × Volume. Verde: abaixo do teto; Vermelho: acima do teto">Economia Real</th>
+                                <th class="text-right" title="Fórmula: Custo Total ÷ Volume = Preço Médio Pago por Litro">Preço Médio</th>
+                                <th class="text-right" title="Fórmula: Soma de todos os valores brutos pagos no posto">Custo Total</th>
+                                <th class="text-right" title="Fórmula: (Preço Referência - Preço Médio) × Volume. Verde: abaixo do teto; Vermelho: acima do teto">Economia Real</th>
                                 <th class="text-center" title="Pareto ABC: Classe A (80% vol), Classe B (15% vol), Classe C (5% vol)">ABC</th>
                             </tr>
                         </thead>
@@ -656,10 +652,10 @@
                         <thead>
                             <tr>
                                 <th class="text-left">Estado</th>
-                                <th class="text-right" title="Volume total de litros no estado">Volume Total (L)</th>
-                                <th class="text-right" title="Representatividade percentual sobre o volume total da frota">Representatividade</th>
+                                <th class="text-right" title="Volume total de litros consumidos no estado">Volume Total (L)</th>
+                                <th class="text-right" title="Fórmula: (Volume do Estado ÷ Volume Total da Frota) × 100">Representatividade</th>
                                 <th class="text-right" title="Preço médio ponderado praticado no estado">Preço Médio</th>
-                                <th class="text-right" title="Economia real consolidada de todas as operações no estado">Economia Real Total</th>
+                                <th class="text-right" title="Fórmula: Soma das economias reais de todas as operações no estado">Economia Real Total</th>
                             </tr>
                         </thead>
                         <tbody id="stateTableBody"></tbody>
@@ -687,9 +683,10 @@
         </div>
     </div>
 
+    <!-- ===== SCRIPT PRINCIPAL ===== -->
     <script>
         // ================================================================
-        // SEGURANÇA ROBUSTA: PBKDF2 (SHA-256 COM 100.000 ITERAÇÕES E SALT)
+        // SEGURANÇA E SESSÃO (PBKDF2 SHA-256 + SALT)
         // ================================================================
         const ADMIN_USERNAME = 'Pedro.cavalheirolog';
 
@@ -743,7 +740,6 @@
 
         let pendente2FA = { user: null, code: null, expira: 0 };
 
-        // Validador de Senha Complexa
         authRegPass.addEventListener('input', () => {
             const val = authRegPass.value;
             const hasLen = val.length >= 8;
@@ -770,7 +766,6 @@
             el.textContent = (valido ? '✓ ' : '✕ ') + texto;
         }
 
-        // Auto-reparo das credenciais administrativas com PBKDF2
         async function inicializarAdminPadrao() {
             let users = JSON.parse(localStorage.getItem('cavalheiro_app_users') || '{}');
             const adminPass = 'Log2026@';
@@ -788,7 +783,6 @@
             }
         }
 
-        // PASSO 1: LOGIN
         async function executarLogin() {
             const user = document.getElementById('authLoginUser').value.trim();
             const pass = document.getElementById('authLoginPass').value;
@@ -806,17 +800,15 @@
                 return;
             }
 
-            // GERAÇÃO DE CÓDIGO 2FA SEGURO DE 6 DÍGITOS
             const codigoGerado = String(Math.floor(100000 + Math.random() * 900000));
             pendente2FA = {
                 user: targetUser.nomeOriginal,
                 isAdmin: targetUser.nomeOriginal.toLowerCase() === ADMIN_USERNAME.toLowerCase(),
                 code: codigoGerado,
-                expira: Date.now() + (5 * 60 * 1000) // 5 minutos de validade
+                expira: Date.now() + (5 * 60 * 1000)
             };
 
-            // Notificação visual do 2FA (Pronto para conectar serviço SMTP/EmailJS)
-            box2faInfo.innerHTML = `Código temporário de segurança enviado para o e-mail cadastrado.<br><br><b>Código 2FA de Acesso:</b> <span style="font-size:16px; color:var(--brand-orange); font-weight:800;">${codigoGerado}</span>`;
+            box2faInfo.innerHTML = `Código temporário de segurança gerado para este acesso.<br><br><b>Código 2FA de Acesso:</b> <span style="font-size:17px; color:var(--brand-orange); font-weight:800;">${codigoGerado}</span>`;
             
             cardStepLogin.style.display = 'none';
             cardStep2FA.style.display = 'flex';
@@ -825,7 +817,6 @@
             alert2FA.style.display = 'none';
         }
 
-        // PASSO 2: CONFIRMAÇÃO DO 2FA
         function confirmar2FA() {
             const codeInput = inputCode2FA.value.trim();
 
@@ -839,7 +830,6 @@
                 return;
             }
 
-            // Sessão autorizada e gravada
             sessionStorage.setItem('cavalheiro_auth_session', JSON.stringify({
                 user: pendente2FA.user,
                 isAdmin: pendente2FA.isAdmin,
@@ -919,7 +909,7 @@
         });
 
         // ================================================================
-        // CREDENCIAIS OFICIAIS TRUCKPAG EMBUTIDAS
+        // CONSTANTES E CONFIGURAÇÕES DA TRUCKPAG
         // ================================================================
         const CREDENCIAIS_TRUCKPAG = {
             usuario: 'CAVALHEIRO.LOGISTICS',
@@ -935,9 +925,6 @@
         let chTop = null, chSav = null, chClass = null, chMain = null, chPrice = null, chAbc = null, chPie = null;
         function safeDestroy(ch) { if (ch) { try { ch.destroy(); } catch(e){} } return null; }
 
-        // ================================================================
-        // TEMA, SIDEBAR E CARREGADOR
-        // ================================================================
         const themeToggle = document.getElementById('themeToggle');
         let isDarkMode = false;
         
@@ -949,6 +936,10 @@
             Chart.defaults.scale.grid.color = isDarkMode ? '#334155' : '#eef0f3';
             renderActiveTab();
         });
+
+        Chart.defaults.font.family = "'Segoe UI', Roboto, sans-serif";
+        Chart.defaults.color = '#6b7a8f';
+        Chart.defaults.scale.grid.color = '#eef0f3';
 
         const sidebar = document.getElementById('sidebar');
         const sidebarCollapseBtn = document.getElementById('sidebarCollapseBtn');
@@ -988,11 +979,42 @@
             }
         }
 
+        function formatAPI(dateStr) { return dateStr.replace(/-/g, ''); }
+
+        // ================================================================
+        // FUNÇÃO DE BUSCA DE PENDÊNCIAS (DEFINIDA ANTES DO USO)
+        // ================================================================
+        async function fetchPendencias(token, dtIni, dtFim) {
+            let v = [], t = [];
+            try {
+                const resV = await fetchAutoCors(`${CREDENCIAIS_TRUCKPAG.apiBase}/NotaFiscal/Vinculo?dtIni=${dtIni}&dtFim=${dtFim}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (resV && resV.ok) {
+                    const txt = await resV.text();
+                    if (txt && txt.trim()) v = JSON.parse(txt);
+                }
+            } catch(e) {
+                console.warn("Vínculos pendentes não puderam ser carregados:", e);
+            }
+            
+            try {
+                const resT = await fetchAutoCors(`${CREDENCIAIS_TRUCKPAG.apiBase}/Faturamento/Titulos?dtini=${formatAPI(dtIni)}&dtfim=${formatAPI(dtFim)}`, { headers: { 'Authorization': `Bearer ${token}` } });
+                if (resT && resT.ok) {
+                    const txt = await resT.text();
+                    if (txt && txt.trim()) t = JSON.parse(txt);
+                }
+            } catch(e) {
+                console.warn("Títulos pendentes não puderam ser carregados:", e);
+            }
+            
+            return {
+                vinculos: Array.isArray(v) ? v : [],
+                titulos: Array.isArray(t) ? t : []
+            };
+        }
+
         // ================================================================
         // MOTOR DE LOTES: 5 DIAS POR CHAMADA (ATÉ 1 ANO DE HISTÓRICO)
         // ================================================================
-        function formatAPI(dateStr) { return dateStr.replace(/-/g, ''); }
-
         function gerarLotesDeDatas(inicioStr, fimStr, diasPorLote = 5) {
             const lotes = [];
             let dAtual = new Date(inicioStr + 'T00:00:00');
@@ -1092,7 +1114,12 @@
             }
 
             uiLoader.show(85, 'Buscando Pendências ERP...');
-            const pendencias = await fetchPendencias(token, dtIni, dtFim);
+            let pendencias = { vinculos: [], titulos: [] };
+            try {
+                pendencias = await fetchPendencias(token, dtIni, dtFim);
+            } catch (errP) {
+                console.warn("Pendências não carregadas:", errP);
+            }
 
             return { result: todasTransacoes, pendencias };
         }
@@ -1131,7 +1158,6 @@
                 const p = map.get(key);
                 p.volume += t.volume; 
                 p.custo += t.valor_total;
-                // Economia Real = (Preço Referência - Preço Praticado) * Volume
                 p.economia += t.volume * (precoRef - t.valor_litro);
                 p.placas.add(t.placa);
                 p.transacoesCount++;
@@ -1281,9 +1307,6 @@
             };
         }
 
-        // ================================================================
-        // ÍCONES DE PINO SVG CUSTOMIZADOS (VERDE, AMARELO, VERMELHO)
-        // ================================================================
         function criarIconePinoSVG(cor) {
             const svgHtml = `
                 <div class="custom-svg-pin">
@@ -1331,7 +1354,6 @@
             const googleHybrid = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { maxZoom: 18, attribution: '© Google Maps' });
             const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' });
 
-            // ZOOM CONTROL MOVIDO PARA A DIREITA SUPERIOR
             mapInstance = L.map('heatmap', { 
                 layers: [googleHybrid], 
                 zoomControl: false 
@@ -1339,7 +1361,6 @@
 
             L.control.zoom({ position: 'topright' }).addTo(mapInstance);
             
-            // Heatmap de alto contraste
             heatmapInstance = L.heatLayer(pontosCalor, {
                 radius: 42,
                 blur: 24,
@@ -1431,9 +1452,9 @@
                 tbody.innerHTML += `<tr>
                     <td class="text-left"><strong>${uf}</strong></td>
                     <td class="text-right" title="Volume total consumido neste estado">${fmt(data.volume)}</td>
-                    <td class="text-right" title="Cálculo: (Volume do Estado ÷ Volume Total da Frota) × 100">${totalVol > 0 ? (data.volume/totalVol*100).toFixed(1) : 0}%</td>
-                    <td class="text-right" title="Cálculo: Custo Total no Estado ÷ Volume no Estado">R$ ${fmt(pMedio)}</td>
-                    <td class="text-right ${eco>=0?'text-green':'text-danger'}" title="Cálculo: (Preço Referência - Preço Médio) × Volume">R$ ${fmt(eco)}</td>
+                    <td class="text-right" title="Fórmula: (Volume do Estado ÷ Volume Total da Frota) × 100">${totalVol > 0 ? (data.volume/totalVol*100).toFixed(1) : 0}%</td>
+                    <td class="text-right" title="Fórmula: Custo Total no Estado ÷ Volume no Estado">R$ ${fmt(pMedio)}</td>
+                    <td class="text-right ${eco>=0?'text-green':'text-danger'}" title="Fórmula: (Preço Referência - Preço Médio) × Volume">R$ ${fmt(eco)}</td>
                 </tr>`;
             });
         }
@@ -1451,22 +1472,22 @@
                     <div class="value">${todosPostos.length}</div>
                     <div class="sub">Unidades atendidas</div>
                 </div>
-                <div class="kpi-card" title="Cálculo: Soma total da litragem abastecida (∑ Litros) em todas as transações do período.">
+                <div class="kpi-card" title="Fórmula: Soma total da litragem abastecida (∑ Litros) em todas as transações do período.">
                     <div class="label">Volume Abastecido</div>
                     <div class="value">${fmt(volT)} L</div>
                     <div class="sub">Período selecionado</div>
                 </div>
-                <div class="kpi-card" title="Cálculo: Soma do valor real pago na bomba: ∑ (Volume × Preço na Bomba) de todas as transações.">
+                <div class="kpi-card" title="Fórmula: Soma do valor real pago na bomba: ∑ (Volume × Preço na Bomba) de todas as transações.">
                     <div class="label">Custo Bruto</div>
                     <div class="value">R$ ${fmt(cusT)}</div>
                     <div class="sub">Valor Total Pago</div>
                 </div>
-                <div class="kpi-card" title="Cálculo: Média ponderada real por litro = Custo Bruto Total ÷ Volume Total Abastecido.">
+                <div class="kpi-card" title="Fórmula: Média ponderada real por litro = Custo Bruto Total ÷ Volume Total Abastecido.">
                     <div class="label">Preço Médio Gasto</div>
                     <div class="value">R$ ${fmt(pMed)}</div>
                     <div class="sub">Ponderado geral</div>
                 </div>
-                <div class="kpi-card highlight" title="Cálculo: (Preço de Referência - Preço Médio Pago) × Volume Total Abastecido. Valores positivos indicam economia negociada; valores negativos indicam gasto acima do teto.">
+                <div class="kpi-card highlight" title="Fórmula: (Preço de Referência - Preço Médio Pago) × Volume Total Abastecido. Valores positivos indicam economia negociada; valores negativos indicam gasto acima do teto.">
                     <div class="label">Economia Real Total</div>
                     <div class="value">R$ ${fmt(ecoT)}</div>
                     <div class="sub">Vs. R$ ${fmt(precoRef)} Ref.</div>
@@ -1659,7 +1680,6 @@
             tbody.innerHTML = rows || `<tr><td colspan="4" class="text-center" style="padding:30px; color:var(--text-muted);">Nenhum dado pendente nesta aba.</td></tr>`;
         }
 
-        // RENDERIZAÇÃO DA ABA ATIVA (COM PROTEÇÃO ABSOLUTA DE CANVAS)
         function renderActiveTab() {
             const activeTab = document.querySelector('.nav-tab.active');
             if (!activeTab) return;
@@ -1820,7 +1840,6 @@
             }
         });
 
-        // Abas
         document.getElementById('navTabs').addEventListener('click', e => {
             if(e.target.closest('.nav-tab')){
                 document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
@@ -1830,7 +1849,6 @@
             }
         });
 
-        // Filtros da Tabela de Postos
         document.querySelectorAll('.period-btn[data-filter]').forEach(b => b.addEventListener('click', function(){
             document.querySelectorAll('.period-btn[data-filter]').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active'); 
@@ -1849,7 +1867,6 @@
             renderStationsTable();
         });
 
-        // Filtros do Mapa
         document.querySelectorAll('.map-pill-btn[data-mapfilter]').forEach(b => b.addEventListener('click', function(){
             document.querySelectorAll('.map-pill-btn[data-mapfilter]').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active'); 
@@ -1870,7 +1887,6 @@
             }
         });
 
-        // Filtros de Integração
         document.querySelectorAll('.period-btn[data-integration]').forEach(b => b.addEventListener('click', function(){
             document.querySelectorAll('.period-btn[data-integration]').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active'); 
@@ -1878,7 +1894,6 @@
             renderIntegration(this.dataset.integration);
         }));
 
-        // Filtros da Evolução
         document.querySelectorAll('.period-btn[data-period]').forEach(b => b.addEventListener('click', function(){
             document.querySelectorAll('.period-btn[data-period]').forEach(btn => btn.classList.remove('active'));
             this.classList.add('active'); 
@@ -1905,7 +1920,7 @@
             inInicio.value = localStorage.getItem('cavalheiro_dtIni') || strHoje;
             inFim.value = localStorage.getItem('cavalheiro_dtFim') || strHoje;
 
-            document.getElementById('globalMessageArea').innerHTML = '<div class="error-container" style="border-color: var(--border-color); color: var(--text-muted);">👆 Configure o período desejado e clique em <b>"FILTRAR"</b> para consultar os dados da frota.</div>';
+            document.getElementById('globalMessageArea').innerHTML = '<div class="error-container" style="border-color: var(--border-color); color: var(--text-muted);">👆 Selecione o período desejado e clique em <b>"FILTRAR"</b> para consultar os dados da frota.</div>';
         };
     </script>
 </body>
