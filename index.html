@@ -168,48 +168,39 @@
             .btn-hamburger { display: block; }
             .btn-open-sidebar { display: none !important; }
             
-            /* Sidebar vira um Drawer lateral na esquerda */
             .sidebar { position: fixed; left: -320px; top: 0; bottom: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.5); z-index: 35; width: 280px; }
             .sidebar.mobile-open { left: 0; }
-            .sidebar.collapsed { width: 280px; opacity: 1; } /* Ignora colapso desktop no mobile */
+            .sidebar.collapsed { width: 280px; opacity: 1; }
             .toggle-btn { display: none; }
             .toggle-btn-mobile { display: flex; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 30px; height: 30px; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; }
             
-            /* Header Adaptado */
             .top-header { padding: 12px; flex-direction: column; align-items: flex-start; gap: 15px; }
             .header-left { width: 100%; justify-content: space-between; }
             .header-right { width: 100%; justify-content: space-between; overflow-x: auto; padding-bottom: 5px; }
             .header-right::-webkit-scrollbar { display: none; }
             
-            /* Área principal */
             .dashboard { padding: 15px; }
             
-            /* Transformando as Abas num scroll horizontal (Swipe) */
             .nav-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; justify-content: flex-start; }
             .nav-tabs::-webkit-scrollbar { height: 4px; }
             .nav-tabs::-webkit-scrollbar-thumb { background-color: var(--brand-orange); border-radius: 4px; }
             .nav-tab { white-space: nowrap; flex-shrink: 0; }
             
-            /* Quebrando os Grids para 1 coluna no celular */
             .charts-grid { grid-template-columns: 1fr !important; gap: 15px;}
             .kpi-grid { grid-template-columns: 1fr; gap: 15px;}
             
-            /* Toolbar Integração Mobile */
             .toolbar-int { flex-direction: column; align-items: stretch; }
             .toolbar-int > div { flex-direction: column; width: 100%; }
             .toolbar-int input { min-width: 100%; width: 100%; }
             .btn-sync { width: 100%; margin-top: 10px; }
             
-            /* Tabelas com Scroll Horizontal Nativo e textos que não esmagam */
             table { font-size: 11px; }
             th, td { white-space: nowrap; padding: 10px 8px; }
             .table-wrap { padding: 10px; }
             
-            /* Otimização do Mapa */
             .map-container { height: 450px; }
             .map-floating-left { width: calc(100% - 30px); top: auto; bottom: 15px; left: 15px; right: 15px; max-height: 200px; overflow-y: auto; }
             
-            /* Modais de Login/Settings */
             .auth-card { padding: 25px 20px; width: 92%; }
             .auth-logo-text { font-size: 28px; }
             .animating-login .auth-logo-text { font-size: 38px; }
@@ -218,7 +209,6 @@
 </head>
 <body>
 
-    <!-- OVERLAY MOBILE (Fundo escuro ao abrir o menu) -->
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
     <!-- 1. LOGIN -->
@@ -262,17 +252,19 @@
         </div>
     </div>
 
-    <!-- 3. CONFIGURAÇÕES (LAYOUT) -->
+    <!-- 3. CONFIGURAÇÕES (LAYOUT E URL DINÂMICA) -->
     <div class="auth-overlay" id="settingsModal" style="display:none; background:rgba(0,0,0,0.8); z-index:999999;">
         <div class="auth-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="color:var(--brand-blue); font-weight:800;">⚙️ Dashboard</h3>
+                <h3 style="color:var(--brand-blue); font-weight:800;">⚙️ Configurações</h3>
                 <button onclick="document.getElementById('settingsModal').style.display='none'" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted);">✕</button>
             </div>
+            
             <div class="auth-field">
                 <label>Cor Temática</label>
                 <input type="color" id="cfgColor1" value="#3b82f6" style="padding:0; height:40px; cursor:pointer; border:none;">
             </div>
+            
             <div class="auth-field" style="margin-top:10px;">
                 <label>Formato do "Top 10"</label>
                 <select id="cfgChartType">
@@ -281,6 +273,7 @@
                     <option value="pie">Gráfico de Pizza</option>
                 </select>
             </div>
+            
             <div class="auth-field" style="margin-top:10px;">
                 <label>Ocultar Blocos da Visão Geral</label>
                 <div class="perm-grid">
@@ -289,7 +282,17 @@
                     <label><input type="checkbox" id="v_classabc" checked> Gráfico ABC</label>
                 </div>
             </div>
-            <button onclick="salvarConfig()" class="auth-btn" style="margin-top:10px;">Aplicar Layout</button>
+
+            <hr style="border-color:var(--border-color); margin:10px 0;">
+            
+            <!-- CAMPO INTELIGENTE PARA ALTERAR O LINK SEM MEXER NO GITHUB -->
+            <div class="auth-field">
+                <label>Link do Servidor (Túnel Cloudflare)</label>
+                <input type="text" id="cfgApiUrl" placeholder="Ex: https://novo-link.trycloudflare.com">
+                <small style="font-size:10px; color:var(--brand-orange); font-weight:bold;">Cole o link novo aqui caso o PC reinicie.</small>
+            </div>
+
+            <button onclick="salvarConfig()" class="auth-btn" style="margin-top:10px;">Salvar Configurações</button>
         </div>
     </div>
 
@@ -362,7 +365,7 @@
             </div>
             <div class="header-right">
                 <span class="user-tag" id="loggedUserTag">👤 Usuário</span>
-                <button class="icon-action-btn" id="btnOpenSettings" title="Personalizar Layout">⚙️ Layout</button>
+                <button class="icon-action-btn" id="btnOpenSettings" title="Personalizar Layout e Conexão">⚙️ Layout</button>
                 <button class="icon-action-btn" id="btnOpenAdmin" title="Novo Usuário" style="display:none; background:var(--brand-orange); color:white; border:none;">➕ Novo</button>
                 <button class="theme-icon-btn" id="themeToggle" title="Modo Escuro">🌙</button>
                 <button class="icon-action-btn" id="logoutBtn" title="Sair do Sistema">🚪 Sair</button>
@@ -458,9 +461,12 @@
 
     <script>
         // ======================================================================================
-        // 🔴 ATENÇÃO: LINK OFICIAL DO CLOUDFLARE INSERIDO ABAIXO
+        // URL DINÂMICA INTELIGENTE - SALVA NO NAVEGADOR
+        // Se o PC reiniciar e o Cloudflare der um link novo, basta o usuário colar o link 
+        // lá nas "Configurações" do Dashboard e o sistema volta a funcionar!
         // ======================================================================================
-        const URL_TUNEL = 'https://documented-blvd-normally-background.trycloudflare.com'; 
+        
+        let apiUrlAtual = localStorage.getItem('cavalheiro_api_url') || 'https://nodes-overview-physically-tahoe.trycloudflare.com';
 
         // --- SISTEMA WEB STANDALONE (NATIVO DOS NAVEGADORES) ---
         let cfgColor = localStorage.getItem('cfg_color') || '#3b82f6';
@@ -468,6 +474,7 @@
         document.documentElement.style.setProperty('--chart-color-1', cfgColor);
 
         window.salvarConfig = function() {
+            // Salva visual
             cfgColor = document.getElementById('cfgColor1').value;
             cfgChartType = document.getElementById('cfgChartType').value;
             localStorage.setItem('cfg_color', cfgColor); localStorage.setItem('cfg_chart', cfgChartType);
@@ -482,8 +489,19 @@
             document.getElementById('box_topeco').style.display = vEco ? 'flex' : 'none';
             document.getElementById('box_classabc').style.display = vAbc ? 'flex' : 'none';
 
+            // Salva a nova URL da API (Se foi alterada)
+            const novaApiUrl = document.getElementById('cfgApiUrl').value.trim().replace(/\/$/, "");
+            if(novaApiUrl) {
+                apiUrlAtual = novaApiUrl;
+                localStorage.setItem('cavalheiro_api_url', apiUrlAtual);
+            }
+
             document.getElementById('settingsModal').style.display = 'none';
             if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-overview') renderTabContent();
+            
+            // Dá um aviso sutil que a URL mudou
+            document.getElementById('statusMsg').innerHTML = 'Configurações e URL atualizadas!';
+            document.getElementById('statusMsg').className = 'status-msg success';
         };
 
         const MASTER_ADMIN = 'pedro.cavalheirolog';
@@ -549,17 +567,14 @@
 
         document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.clear(); window.location.reload(); });
 
-        // Função de Toggle adaptada para Responsivo (Celular)
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileOverlay');
             
             if (window.innerWidth <= 768) {
-                // Comportamento Celular (Drawer & Overlay)
                 sidebar.classList.toggle('mobile-open');
                 overlay.classList.toggle('active');
             } else {
-                // Comportamento Desktop (Collapse lateral)
                 const btnOpen = document.getElementById('btnOpenSidebar');
                 sidebar.classList.toggle('collapsed');
                 btnOpen.style.display = sidebar.classList.contains('collapsed') ? 'block' : 'none';
@@ -587,7 +602,6 @@
             return { dtIni: `${ano}-${mes}-${String(dI).padStart(2,'0')}`, dtFim: `${ano}-${mes}-${String(dF).padStart(2,'0')}` };
         }
 
-        // --- REGRA NFE E PDF NATIVO ---
         function formatarCNPJ(cnpj) {
             if(!cnpj) return ''; cnpj = cnpj.replace(/\D/g, ''); if(cnpj.length !== 14) return cnpj;
             return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
@@ -611,7 +625,6 @@
             window.open(`https://www.fsist.com.br/imprimir-danfe?chave=${chave}`, '_blank');
         };
 
-        // --- DADOS E MAPAS ---
         let transacoesGlobais = [], transacoesFiltradas = [], todosPostos = [];
         let mapInstance = null, heatLayer = null, markersLayer = null;
 
@@ -857,15 +870,14 @@
             setTimeout(renderTabContent, 50); 
         });
 
-        // --- INTEGRAÇÃO DIRETA COM A NUVEM (VIA CLOUDFLARE) ---
+        // --- FETCH NA API (USANDO O LINK SALVO DO NAVEGADOR) ---
         async function fetchAPI(forcarSincronizacao = false) {
             const status = document.getElementById('statusMsg');
             const dates = getDatasFiltro();
             status.innerHTML = 'Processando...'; status.className = 'status-msg';
 
             try {
-                // Checa a URL do Túnel e limpa qualquer barra perdida no final
-                const BASE_API = (URL_TUNEL && URL_TUNEL !== 'COLOQUE_SEU_LINK_AQUI') ? URL_TUNEL.replace(/\/$/, "") : 'http://localhost:3000';
+                const BASE_API = apiUrlAtual || 'http://localhost:3000';
                 let response;
 
                 if(forcarSincronizacao) {
@@ -889,7 +901,7 @@
                     processarDados(); renderTabContent(); 
                 }
             } catch (e) {
-                status.innerHTML = `❌ Falha no Servidor. Verifique se o CMD e o Túnel estão abertos!`; status.className = 'status-msg error';
+                status.innerHTML = `❌ Falha no Servidor. Verifique se o CMD e o Túnel estão abertos e se o link em ⚙️ Layout está atualizado!`; status.className = 'status-msg error';
             }
         }
 
@@ -909,12 +921,15 @@
                 document.getElementById('loggedUserTag').innerHTML = `👤 ${user}`;
                 
                 document.getElementById('btnOpenAdmin').addEventListener('click', () => document.getElementById('adminModal').style.display='flex');
+                
+                // Abre modal de configurações já com o Link preenchido para visualização
                 document.getElementById('btnOpenSettings').addEventListener('click', () => {
                     document.getElementById('cfgColor1').value = cfgColor;
                     document.getElementById('cfgChartType').value = cfgChartType;
                     document.getElementById('v_topvol').checked = localStorage.getItem('v_topvol') !== 'false';
                     document.getElementById('v_topeco').checked = localStorage.getItem('v_topeco') !== 'false';
                     document.getElementById('v_classabc').checked = localStorage.getItem('v_classabc') !== 'false';
+                    document.getElementById('cfgApiUrl').value = apiUrlAtual; // <-- Mostra o link atual aqui
                     document.getElementById('settingsModal').style.display = 'flex';
                 });
 
