@@ -285,7 +285,6 @@
 
             <hr style="border-color:var(--border-color); margin:10px 0;">
             
-            <!-- CAMPO INTELIGENTE PARA ALTERAR O LINK SEM MEXER NO GITHUB -->
             <div class="auth-field">
                 <label>Link do Servidor (Túnel Cloudflare)</label>
                 <input type="text" id="cfgApiUrl" placeholder="Ex: https://novo-link.trycloudflare.com">
@@ -460,21 +459,14 @@
     </div>
 
     <script>
-        // ======================================================================================
-        // URL DINÂMICA INTELIGENTE - SALVA NO NAVEGADOR
-        // Se o PC reiniciar e o Cloudflare der um link novo, basta o usuário colar o link 
-        // lá nas "Configurações" do Dashboard e o sistema volta a funcionar!
-        // ======================================================================================
-        
-        let apiUrlAtual = localStorage.getItem('cavalheiro_api_url') || 'https://nodes-overview-physically-tahoe.trycloudflare.com';
+        const URL_TUNEL = 'https://nodes-overview-physically-tahoe.trycloudflare.com'; 
+        let apiUrlAtual = localStorage.getItem('cavalheiro_api_url') || URL_TUNEL;
 
-        // --- SISTEMA WEB STANDALONE (NATIVO DOS NAVEGADORES) ---
         let cfgColor = localStorage.getItem('cfg_color') || '#3b82f6';
         let cfgChartType = localStorage.getItem('cfg_chart') || 'bar';
         document.documentElement.style.setProperty('--chart-color-1', cfgColor);
 
         window.salvarConfig = function() {
-            // Salva visual
             cfgColor = document.getElementById('cfgColor1').value;
             cfgChartType = document.getElementById('cfgChartType').value;
             localStorage.setItem('cfg_color', cfgColor); localStorage.setItem('cfg_chart', cfgChartType);
@@ -489,7 +481,6 @@
             document.getElementById('box_topeco').style.display = vEco ? 'flex' : 'none';
             document.getElementById('box_classabc').style.display = vAbc ? 'flex' : 'none';
 
-            // Salva a nova URL da API (Se foi alterada)
             const novaApiUrl = document.getElementById('cfgApiUrl').value.trim().replace(/\/$/, "");
             if(novaApiUrl) {
                 apiUrlAtual = novaApiUrl;
@@ -499,7 +490,6 @@
             document.getElementById('settingsModal').style.display = 'none';
             if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-overview') renderTabContent();
             
-            // Dá um aviso sutil que a URL mudou
             document.getElementById('statusMsg').innerHTML = 'Configurações e URL atualizadas!';
             document.getElementById('statusMsg').className = 'status-msg success';
         };
@@ -616,13 +606,21 @@
             return '07.689.042/0001-20';
         }
 
-        window.abrirNFeSefaz = function(chave) {
-            if(!chave) return alert('Chave NFe não disponível.');
-            window.open(`https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx?tipoConsulta=resumo&tipoConteudo=7PhJ+gAVw2g=&chaveNFe=${chave}`, '_blank');
-        };
+        // =======================================================================
+        // NOVA FUNÇÃO DE PDF INTELIGENTE (Bypass no bloqueio de robôs da Sefaz/FSist)
+        // =======================================================================
         window.baixarNFePdf = function(chave) {
             if(!chave) return alert('Chave NFe não disponível.');
-            window.open(`https://www.fsist.com.br/imprimir-danfe?chave=${chave}`, '_blank');
+            
+            // Copia a chave automaticamente para a área de transferência do usuário
+            navigator.clipboard.writeText(chave).then(() => {
+                alert('✅ CHAVE DA NOTA COPIADA COM SUCESSO!\n\nPara a sua segurança, o portal gratuito de notas fiscais exige que você cole a chave manualmente.\n\nO portal será aberto agora. Basta clicar na barra de pesquisa deles, apertar "Colar" (ou Ctrl+V) e você poderá visualizar e baixar o PDF no seu computador.');
+                window.open('https://www.fsist.com.br/', '_blank');
+            }).catch(err => {
+                // Fallback caso o navegador do celular bloqueie a cópia automática
+                prompt('Seu navegador bloqueou a cópia automática. Por favor, copie a chave abaixo e cole no portal (FSist) que será aberto para baixar o PDF:', chave);
+                window.open('https://www.fsist.com.br/', '_blank');
+            });
         };
 
         let transacoesGlobais = [], transacoesFiltradas = [], todosPostos = [];
@@ -831,7 +829,8 @@
 
                 if (flegErroCnpj && !hasErroCNPJ) return; 
 
-                const btnSefaz = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe" onclick="abrirNFeSefaz('${t.chave_nfe}')">📄 Sefaz</a> <a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}')">⬇️ PDF</a></div>` : '';
+                // BOTÃO ÚNICO DE VISUALIZAR / BAIXAR PDF (Sem o botão do Sefaz)
+                const btnPdf = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}')">📄 Visualizar / Baixar PDF</a></div>` : '';
 
                 tb.innerHTML += `<tr>
                     <td>${dtStr}</td>
@@ -846,7 +845,7 @@
                             <b><span style="color:${hasNfe?'var(--success)':'var(--danger)'}">${hasNfe?'✅ Vinculada':'⚠️ Pendente'}</span></b>
                             ${hasNfe ? `<small style="color:var(--text-muted)">${t.chave_nfe||''}</small>` : ''}
                             <div>${cnpjStatus}</div>
-                            ${btnSefaz}
+                            ${btnPdf}
                         </div>
                     </td>
                 </tr>`;
@@ -922,14 +921,13 @@
                 
                 document.getElementById('btnOpenAdmin').addEventListener('click', () => document.getElementById('adminModal').style.display='flex');
                 
-                // Abre modal de configurações já com o Link preenchido para visualização
                 document.getElementById('btnOpenSettings').addEventListener('click', () => {
                     document.getElementById('cfgColor1').value = cfgColor;
                     document.getElementById('cfgChartType').value = cfgChartType;
                     document.getElementById('v_topvol').checked = localStorage.getItem('v_topvol') !== 'false';
                     document.getElementById('v_topeco').checked = localStorage.getItem('v_topeco') !== 'false';
                     document.getElementById('v_classabc').checked = localStorage.getItem('v_classabc') !== 'false';
-                    document.getElementById('cfgApiUrl').value = apiUrlAtual; // <-- Mostra o link atual aqui
+                    document.getElementById('cfgApiUrl').value = apiUrlAtual; 
                     document.getElementById('settingsModal').style.display = 'flex';
                 });
 
