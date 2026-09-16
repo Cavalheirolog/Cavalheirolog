@@ -137,10 +137,12 @@
         .toolbar-int { display:flex; gap:10px; margin-bottom: 20px; align-items:center; justify-content:space-between; background:var(--bg-color); padding:10px; border-radius:8px; border:1px solid var(--border-color);}
         .toolbar-int input { flex:1; min-width:300px; padding:12px 15px; border-radius:6px; border:1px solid var(--border-color); background:var(--surface-color); color:var(--text-main); outline:none; font-size:14px; font-weight:600;}
         .toolbar-int input:focus { border-color: var(--chart-color-1); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);}
-        .btn-sync { padding:10px 15px; background:var(--brand-blue); color:white; border:none; border-radius:6px; font-size:18px; width:46px; height:46px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;}
-        .btn-sync:hover { transform: rotate(15deg) scale(1.1); }
-        .btn-filter-cnpj { padding:12px 15px; background:var(--danger); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
         
+        .btn-sync { padding:10px 15px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:6px; font-size:18px; width:46px; height:46px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;}
+        .btn-sync:hover { background:var(--border-color); transform: scale(1.05); }
+        .btn-sync-api { padding:10px 15px; background:var(--brand-blue); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
+        .btn-sync-api:hover { background:var(--brand-orange); }
+
         .status-box { display:flex; flex-direction:column; gap:6px; }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; width:max-content; }
         .badge.green { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -184,7 +186,7 @@
             .toolbar-int { flex-direction: column; align-items: stretch; }
             .toolbar-int > div { flex-direction: column; width: 100%; }
             .toolbar-int input { min-width: 100%; width: 100%; }
-            .btn-sync { width: 100%; margin-top: 10px; }
+            .btn-sync-api, .btn-sync { width: 100%; margin-top: 10px; justify-content: center;}
             
             table { font-size: 11px; }
             th, td { white-space: nowrap; padding: 10px 8px; }
@@ -284,7 +286,7 @@
         </div>
     </div>
 
-    <!-- 4. SIDEBAR (Sem a opção semanal) -->
+    <!-- 4. SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <span>FILTROS DA FROTA</span>
@@ -413,9 +415,9 @@
                     <div class="toolbar-int">
                         <div style="display:flex; gap:10px; flex:1;">
                             <input type="text" id="intSearchInput" placeholder="🔍 Buscar por Data, Posto, Placa, NFe ou CNPJ...">
-                            <button class="btn-filter-cnpj" id="btnFiltroCNPJ">⚠️ Mostrar Erros</button>
+                            <button class="btn-sync" id="btnRecarregarTela" title="Recarregar Dados Salvos do Banco Local">🔄</button>
                         </div>
-                        <button class="btn-sync" id="btnSyncApi" title="Forçar Atualização na API em Lotes Automáticos">🔄 Atualizar API</button>
+                        <button class="btn-sync-api" id="btnSyncApi" title="Manda o Servidor buscar os dados na TruckPag em Lotes de 5 dias">☁️ Iniciar Carga da TruckPag</button>
                     </div>
                     <table>
                         <thead>
@@ -553,7 +555,6 @@
 
         function preencherAnos() { const a = new Date().getFullYear(); const s = document.getElementById('selAno'); [a, a-1, a-2].forEach(v => s.innerHTML += `<option value="${v}">${v}</option>`); }
         
-        // --- FILTROS (Semanal Removido) ---
         window.alternarCamposPeriodo = function() {
             const val = document.getElementById('tipoPeriodoSelect').value;
             document.getElementById('boxDiario').style.display = val === 'diario' ? 'block' : 'none';
@@ -582,9 +583,6 @@
             return '07.689.042/0001-20';
         }
 
-        // =======================================================================
-        // BOTÃO ÚNICO DE VISUALIZAR / BAIXAR PDF
-        // =======================================================================
         window.baixarNFePdf = function(chave) {
             if(!chave) return alert('Chave NFe não disponível.');
             
@@ -774,7 +772,6 @@
             }
         }
 
-        let flegErroCnpj = false;
         function renderIntegrationTable() {
             const tb = document.getElementById('tbInt'); tb.innerHTML = '';
             const termo = document.getElementById('intSearchInput').value.toLowerCase();
@@ -790,20 +787,15 @@
                 const cnpjRecebido = formatarCNPJ(t.cnpj_cliente || '');
                 const hasNfe = t.status_nfe === 'Vinculada';
                 let cnpjStatus = '<span class="badge warning" style="color:var(--warning); font-weight:normal">Aguardando NFe</span>';
-                let hasErroCNPJ = false;
-
+                
                 if (hasNfe) {
                     if (cnpjRecebido === cnpjEsperado) {
                         cnpjStatus = `<span class="badge green">✅ CNPJ OK (${cnpjEsperado})</span>`;
                     } else {
                         cnpjStatus = `<span class="badge red" style="display:inline-block; margin-top:4px;">❌ ERRO. EMITIDO: ${cnpjRecebido||'ND'}<br>ESPERADO: ${cnpjEsperado}</span>`;
-                        hasErroCNPJ = true;
                     }
                 }
 
-                if (flegErroCnpj && !hasErroCNPJ) return; 
-
-                // BOTÃO ÚNICO DE PDF COM CÓPIA INTELIGENTE
                 const btnPdf = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}')">📄 Visualizar / Baixar PDF</a></div>` : '';
 
                 tb.innerHTML += `<tr>
@@ -827,12 +819,6 @@
         }
         
         document.getElementById('intSearchInput').addEventListener('input', renderIntegrationTable);
-        document.getElementById('btnFiltroCNPJ').addEventListener('click', (e) => {
-            flegErroCnpj = !flegErroCnpj;
-            e.target.style.background = flegErroCnpj ? '#800000' : 'var(--danger)';
-            e.target.innerHTML = flegErroCnpj ? '🛑 Mostrando Erros' : '⚠️ Mostrar CNPJs Errados';
-            renderIntegrationTable();
-        });
         document.getElementById('mapSearch').addEventListener('input', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
         document.getElementById('toggleHeatmapCheck').addEventListener('change', (e) => { if (!mapInstance || !heatLayer) return; if (e.target.checked) mapInstance.addLayer(heatLayer); else mapInstance.removeLayer(heatLayer); });
 
@@ -843,50 +829,68 @@
             setTimeout(renderTabContent, 50); 
         });
 
-        // --- FETCH NA API COM AVISO DE LOTES AUTOMÁTICOS ---
-        async function fetchAPI(forcarSincronizacao = false) {
+        // --- FETCH NA API COM COMPORTAMENTO ASSÍNCRONO (NÃO TRAVA A TELA) ---
+        async function fetchAPILocal() {
             const status = document.getElementById('statusMsg');
             const dates = getDatasFiltro();
-            
-            if(forcarSincronizacao) {
-                status.innerHTML = 'Baixando em Lotes. Pode levar 1 minuto...'; 
-                status.className = 'status-msg warning';
-            } else {
-                status.innerHTML = 'Processando...'; 
-                status.className = 'status-msg';
-            }
+            status.innerHTML = 'Processando...'; status.className = 'status-msg';
 
             try {
                 const BASE_API = apiUrlAtual || 'http://localhost:3000';
-                let response;
-
-                if(forcarSincronizacao) {
-                    response = await fetch(`${BASE_API}/api/forcar-sync`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(dates)
-                    });
-                } else {
-                    response = await fetch(`${BASE_API}/api/dados?dtIni=${dates.dtIni}&dtFim=${dates.dtFim}`);
-                }
-
+                const response = await fetch(`${BASE_API}/api/dados?dtIni=${dates.dtIni}&dtFim=${dates.dtFim}`);
                 const res = await response.json();
                 transacoesGlobais = res.transacoes || [];
                 
                 if(transacoesGlobais.length === 0) {
-                    status.innerHTML = '⚠️ Nenhum dado no período'; status.className = 'status-msg warning'; document.getElementById('kpiGrid').innerHTML = '';
+                    status.innerHTML = '⚠️ Nenhum dado no período (Banco Vazio)'; status.className = 'status-msg warning'; document.getElementById('kpiGrid').innerHTML = '';
                 } else {
-                    status.innerHTML = `✅ ${transacoesGlobais.length} Carregados (Nuvem)`;
+                    status.innerHTML = `✅ ${transacoesGlobais.length} Carregados (Banco Local)`;
                     status.className = 'status-msg success';
                     processarDados(); renderTabContent(); 
                 }
             } catch (e) {
-                status.innerHTML = `❌ Falha no Servidor. Verifique se o CMD e o Túnel estão abertos e se o link em ⚙️ Layout está atualizado!`; status.className = 'status-msg error';
+                status.innerHTML = `❌ Falha no Servidor. Verifique o CMD e o Link no Layout.`; status.className = 'status-msg error';
             }
         }
 
-        document.getElementById('btnConectar').addEventListener('click', () => fetchAPI(false));
-        document.getElementById('btnSyncApi').addEventListener('click', () => fetchAPI(true));
+        async function acionarRoboTruckPag() {
+            const btn = document.getElementById('btnSyncApi');
+            const dates = getDatasFiltro();
+            const BASE_API = apiUrlAtual || 'http://localhost:3000';
+
+            btn.innerHTML = '⏳ Servidor Processando...';
+            btn.style.background = '#f59e0b';
+            
+            try {
+                // Rota nova do Servidor que não trava o navegador
+                const response = await fetch(`${BASE_API}/api/forcar-sync-background`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dates)
+                });
+                
+                const res = await response.json();
+                alert('🚀 ' + res.message);
+                
+                setTimeout(() => {
+                    btn.innerHTML = '☁️ Iniciar Carga da TruckPag';
+                    btn.style.background = 'var(--brand-blue)';
+                }, 3000);
+
+            } catch(e) {
+                alert('❌ Erro de conexão ao tentar acionar a TruckPag. Verifique o servidor local.');
+                btn.innerHTML = '☁️ Iniciar Carga da TruckPag';
+                btn.style.background = 'var(--brand-blue)';
+            }
+        }
+
+        // Botões do Painel Principal
+        document.getElementById('btnConectar').addEventListener('click', fetchAPILocal);
+        
+        // Botões da Aba Integração NFe
+        document.getElementById('btnRecarregarTela').addEventListener('click', fetchAPILocal);
+        document.getElementById('btnSyncApi').addEventListener('click', acionarRoboTruckPag);
+        
         document.getElementById('filtroTipoAbast').addEventListener('change', () => { if(transacoesGlobais.length>0){ processarDados(); renderTabContent(); } });
 
         window.onload = async () => {
