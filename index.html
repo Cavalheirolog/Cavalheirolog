@@ -36,13 +36,11 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
-        /* Custom Tooltips */
         .tooltip-container { position: relative; cursor: help; }
         .tooltip-box { visibility: hidden; opacity: 0; width: 280px; background-color: #1e293b; color: #fff; text-align: left; border-radius: 8px; padding: 12px; position: absolute; z-index: 1000; bottom: 120%; left: 50%; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 11px; font-weight: normal; transition: opacity 0.3s, bottom 0.3s; line-height: 1.5; pointer-events: none;}
         .tooltip-box::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent; }
         .tooltip-container:hover .tooltip-box { visibility: visible; opacity: 1; bottom: 130%; }
 
-        /* Animações Login */
         .auth-overlay { position: fixed; inset: 0; z-index: 99999; background: linear-gradient(135deg, #0b1121, #1e293b); display: flex; align-items: center; justify-content: center; padding:20px; transition: opacity 1.5s ease-in-out;}
         .auth-card { background: var(--surface-color); width: 100%; max-width: 440px; border-radius: 16px; padding: 40px 35px; border-top: 5px solid var(--brand-orange); display: flex; flex-direction: column; gap: 20px; box-shadow: 0 25px 50px rgba(0,0,0,0.5); transition: all 1s ease-in-out; max-height: 90vh; overflow-y: auto;}
         .auth-logo-text { font-size: 36px; font-weight: 800; color: var(--brand-blue); text-align: center; transition: all 1s ease;}
@@ -63,7 +61,6 @@
         .perm-grid { display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:var(--bg-color); padding:12px; border-radius:8px; border:1px solid var(--border-color); }
         .perm-grid label { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; cursor:pointer;}
 
-        /* Sidebar Desktop */
         .sidebar { width: 300px; background: var(--sidebar-bg); color: var(--text-light); padding: 20px; display: flex; flex-direction: column; gap: 15px; height: 100vh; overflow-y:auto; border-right: 4px solid var(--brand-orange); z-index: 30; transition: width 0.3s ease, padding 0.3s ease, left 0.3s ease;}
         .sidebar.collapsed { width: 0; padding: 0; border-right: none; overflow: hidden; opacity: 0; }
         .sidebar-header { display:flex; justify-content:space-between; align-items:center; font-size:13px; font-weight:800; margin-bottom: 5px; color:#fff; letter-spacing: 1px;}
@@ -85,7 +82,6 @@
         .status-msg.warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
         .status-msg.error { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
 
-        /* Main View */
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; width: 100%; transition: all 0.3s ease; position: relative;}
         .top-header { background: var(--surface-color); padding: 12px 25px; display: flex; justify-content: space-between; align-items:center; border-bottom: 1px solid var(--border-color); }
         .header-left { display:flex; align-items:center; gap:15px; }
@@ -157,13 +153,9 @@
         .btn-nfe.alt { background: var(--success); }
         .btn-nfe.alt:hover { background: #059669; }
 
-        /* Overlay para Mobile Menu */
         .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 25; backdrop-filter: blur(2px); }
         .mobile-overlay.active { display: block; }
 
-        /* ========================================================================= */
-        /* RESPONSIVIDADE (SMARTPHONES E TABLETS) - MOBILE FIRST ADAPTATION          */
-        /* ========================================================================= */
         @media (max-width: 768px) {
             .btn-hamburger { display: block; }
             .btn-open-sidebar { display: none !important; }
@@ -211,7 +203,6 @@
 
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
-    <!-- 1. LOGIN -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-card" id="loginCard">
             <div class="auth-logo-text" id="logoText">Cavalheiro<span style="color:var(--brand-orange)">log</span></div>
@@ -225,7 +216,6 @@
         </div>
     </div>
 
-    <!-- 2. ADMIN MODAL -->
     <div class="auth-overlay" id="adminModal" style="display:none; background:rgba(0,0,0,0.8); z-index:999999;">
         <div class="auth-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -252,7 +242,6 @@
         </div>
     </div>
 
-    <!-- 3. CONFIGURAÇÕES (LAYOUT E URL DINÂMICA) -->
     <div class="auth-overlay" id="settingsModal" style="display:none; background:rgba(0,0,0,0.8); z-index:999999;">
         <div class="auth-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -295,7 +284,7 @@
         </div>
     </div>
 
-    <!-- 4. SIDEBAR -->
+    <!-- 4. SIDEBAR (Sem a opção semanal) -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <span>FILTROS DA FROTA</span>
@@ -307,7 +296,6 @@
                 <label>📆 Período</label>
                 <select id="tipoPeriodoSelect" onchange="alternarCamposPeriodo()">
                     <option value="diario">Diário (Livre)</option>
-                    <option value="semanal">Semanal (7 Dias)</option>
                     <option value="mensal">Mensal (Fechado)</option>
                 </select>
             </div>
@@ -325,15 +313,6 @@
                         <option value="04">Abr</option><option value="05">Mai</option><option value="06">Jun</option>
                         <option value="07">Jul</option><option value="08">Ago</option><option value="09">Set</option>
                         <option value="10">Out</option><option value="11">Nov</option><option value="12">Dez</option>
-                    </select>
-                </div>
-            </div>
-            <div id="boxSemana" style="display:none; margin-top:8px;">
-                <div class="field"><label>Semana</label>
-                    <select id="selSemana">
-                        <option value="1">1ª Sem (01 a 07)</option><option value="2">2ª Sem (08 a 14)</option>
-                        <option value="3">3ª Sem (15 a 21)</option><option value="4">4ª Sem (22 a 28)</option>
-                        <option value="5">5ª Sem (29 a Fim)</option>
                     </select>
                 </div>
             </div>
@@ -436,7 +415,7 @@
                             <input type="text" id="intSearchInput" placeholder="🔍 Buscar por Data, Posto, Placa, NFe ou CNPJ...">
                             <button class="btn-filter-cnpj" id="btnFiltroCNPJ">⚠️ Mostrar Erros</button>
                         </div>
-                        <button class="btn-sync" id="btnSyncApi" title="Forçar Atualização na API (Hoje)">🔄</button>
+                        <button class="btn-sync" id="btnSyncApi" title="Forçar Atualização na API em Lotes Automáticos">🔄 Atualizar API</button>
                     </div>
                     <table>
                         <thead>
@@ -573,11 +552,12 @@
         };
 
         function preencherAnos() { const a = new Date().getFullYear(); const s = document.getElementById('selAno'); [a, a-1, a-2].forEach(v => s.innerHTML += `<option value="${v}">${v}</option>`); }
+        
+        // --- FILTROS (Semanal Removido) ---
         window.alternarCamposPeriodo = function() {
             const val = document.getElementById('tipoPeriodoSelect').value;
             document.getElementById('boxDiario').style.display = val === 'diario' ? 'block' : 'none';
-            document.getElementById('boxMensal').style.display = val !== 'diario' ? 'block' : 'none';
-            document.getElementById('boxSemana').style.display = val === 'semanal' ? 'block' : 'none';
+            document.getElementById('boxMensal').style.display = val === 'mensal' ? 'block' : 'none';
         };
 
         function getDatasFiltro() {
@@ -585,11 +565,7 @@
             if (tipo === 'diario') return { dtIni: document.getElementById('dataInicio').value, dtFim: document.getElementById('dataFim').value };
             const ano = document.getElementById('selAno').value; const mes = document.getElementById('selMes').value;
             const ultimoDia = new Date(ano, parseInt(mes), 0).getDate();
-            if (tipo === 'mensal') return { dtIni: `${ano}-${mes}-01`, dtFim: `${ano}-${mes}-${String(ultimoDia).padStart(2,'0')}` };
-            const sem = parseInt(document.getElementById('selSemana').value);
-            let dI = 1, dF = 7;
-            if(sem===2){ dI=8; dF=14;} else if(sem===3){ dI=15; dF=21;} else if(sem===4){ dI=22; dF=28;} else if(sem===5){ dI=29; dF=ultimoDia;}
-            return { dtIni: `${ano}-${mes}-${String(dI).padStart(2,'0')}`, dtFim: `${ano}-${mes}-${String(dF).padStart(2,'0')}` };
+            return { dtIni: `${ano}-${mes}-01`, dtFim: `${ano}-${mes}-${String(ultimoDia).padStart(2,'0')}` };
         }
 
         function formatarCNPJ(cnpj) {
@@ -607,18 +583,16 @@
         }
 
         // =======================================================================
-        // NOVA FUNÇÃO DE PDF INTELIGENTE (Bypass no bloqueio de robôs da Sefaz/FSist)
+        // BOTÃO ÚNICO DE VISUALIZAR / BAIXAR PDF
         // =======================================================================
         window.baixarNFePdf = function(chave) {
             if(!chave) return alert('Chave NFe não disponível.');
             
-            // Copia a chave automaticamente para a área de transferência do usuário
             navigator.clipboard.writeText(chave).then(() => {
-                alert('✅ CHAVE DA NOTA COPIADA COM SUCESSO!\n\nPara a sua segurança, o portal gratuito de notas fiscais exige que você cole a chave manualmente.\n\nO portal será aberto agora. Basta clicar na barra de pesquisa deles, apertar "Colar" (ou Ctrl+V) e você poderá visualizar e baixar o PDF no seu computador.');
+                alert('✅ CHAVE DA NOTA COPIADA COM SUCESSO!\n\nO portal será aberto agora. Basta clicar na barra de pesquisa, apertar "Colar" (ou Ctrl+V) e você poderá visualizar e baixar o PDF.');
                 window.open('https://www.fsist.com.br/', '_blank');
             }).catch(err => {
-                // Fallback caso o navegador do celular bloqueie a cópia automática
-                prompt('Seu navegador bloqueou a cópia automática. Por favor, copie a chave abaixo e cole no portal (FSist) que será aberto para baixar o PDF:', chave);
+                prompt('Seu navegador bloqueou a cópia automática. Por favor, copie a chave abaixo e cole no portal que será aberto:', chave);
                 window.open('https://www.fsist.com.br/', '_blank');
             });
         };
@@ -829,7 +803,7 @@
 
                 if (flegErroCnpj && !hasErroCNPJ) return; 
 
-                // BOTÃO ÚNICO DE VISUALIZAR / BAIXAR PDF (Sem o botão do Sefaz)
+                // BOTÃO ÚNICO DE PDF COM CÓPIA INTELIGENTE
                 const btnPdf = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}')">📄 Visualizar / Baixar PDF</a></div>` : '';
 
                 tb.innerHTML += `<tr>
@@ -869,11 +843,18 @@
             setTimeout(renderTabContent, 50); 
         });
 
-        // --- FETCH NA API (USANDO O LINK SALVO DO NAVEGADOR) ---
+        // --- FETCH NA API COM AVISO DE LOTES AUTOMÁTICOS ---
         async function fetchAPI(forcarSincronizacao = false) {
             const status = document.getElementById('statusMsg');
             const dates = getDatasFiltro();
-            status.innerHTML = 'Processando...'; status.className = 'status-msg';
+            
+            if(forcarSincronizacao) {
+                status.innerHTML = 'Baixando em Lotes. Pode levar 1 minuto...'; 
+                status.className = 'status-msg warning';
+            } else {
+                status.innerHTML = 'Processando...'; 
+                status.className = 'status-msg';
+            }
 
             try {
                 const BASE_API = apiUrlAtual || 'http://localhost:3000';
