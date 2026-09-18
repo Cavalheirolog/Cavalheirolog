@@ -142,6 +142,8 @@
         .btn-sync:hover { background:var(--border-color); transform: scale(1.05); }
         .btn-sync-api { padding:10px 15px; background:var(--brand-blue); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
         .btn-sync-api:hover { background:var(--brand-orange); }
+        .btn-export { padding:10px 15px; background:#10b981; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
+        .btn-export:hover { background:#059669; }
 
         .status-box { display:flex; flex-direction:column; gap:6px; }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; width:max-content; }
@@ -186,7 +188,7 @@
             .toolbar-int { flex-direction: column; align-items: stretch; }
             .toolbar-int > div { flex-direction: column; width: 100%; }
             .toolbar-int input { min-width: 100%; width: 100%; }
-            .btn-sync-api, .btn-sync { width: 100%; margin-top: 10px; justify-content: center;}
+            .btn-sync-api, .btn-sync, .btn-export { width: 100%; margin-top: 10px; justify-content: center;}
             
             table { font-size: 11px; }
             th, td { white-space: nowrap; padding: 10px 8px; }
@@ -417,6 +419,7 @@
                         <div style="display:flex; gap:10px;">
                             <button class="btn-sync" id="btnRecarregarTela" title="Atualiza a tela com os dados do banco local">🔄 Local</button>
                             <button class="btn-sync-api" id="btnSyncApi" title="Manda o Servidor baixar os dados faltantes da TruckPag">⬇️ Nuvem</button>
+                            <button class="btn-export" id="btnExportCSV" title="Exporta os dados filtrados em CSV para o Excel">📥 Exportar CSV</button>
                         </div>
                     </div>
                     <table>
@@ -585,7 +588,6 @@
 
         window.baixarNFePdf = function(chave) {
             if(!chave) return alert('Chave NFe não disponível.');
-            
             navigator.clipboard.writeText(chave).then(() => {
                 alert('✅ CHAVE DA NOTA COPIADA COM SUCESSO!\n\nO portal será aberto agora. Basta clicar na barra de pesquisa, apertar "Colar" (ou Ctrl+V) e você poderá visualizar e baixar o PDF.');
                 window.open('https://www.fsist.com.br/', '_blank');
@@ -593,6 +595,38 @@
                 prompt('Seu navegador bloqueou a cópia automática. Por favor, copie a chave abaixo e cole no portal que será aberto:', chave);
                 window.open('https://www.fsist.com.br/', '_blank');
             });
+        };
+
+        // --- NOVA FUNÇÃO DE EXPORTAR CSV ---
+        window.exportarCSV = function() {
+            if (!transacoesFiltradas || transacoesFiltradas.length === 0) {
+                return alert("Nenhum dado na tela para exportar. Filtre primeiro.");
+            }
+            
+            let csv = "Data;Transacao;Posto;Cidade;UF;Tipo Abastecimento;Placa;Motorista;Volume(L);Valor Total(R$);Valor Litro(R$);Status NFe;Chave NFe;CNPJ Posto;CNPJ Cliente;Combustivel\n";
+            
+            transacoesFiltradas.forEach(t => {
+                const dtStr = t.data ? t.data.split(' ')[0].split('-').reverse().join('/') : 'ND';
+                const row = [
+                    dtStr, t.id, `"${t.estabelecimento}"`, `"${t.cidade}"`, t.uf, 
+                    t.tipoAbastecimento, t.placa, `"${t.motorista}"`, 
+                    String(t.volume).replace('.', ','), 
+                    String(t.valor_total).replace('.', ','), 
+                    String(t.valor_litro).replace('.', ','), 
+                    t.status_nfe, t.chave_nfe, t.cnpj_posto, t.cnpj_cliente, t.combustivel
+                ];
+                csv += row.join(";") + "\n";
+            });
+            
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); 
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            const dts = getDatasFiltro();
+            link.setAttribute("href", url);
+            link.setAttribute("download", `auditoria_cavalheirolog_${dts.dtIni}_ate_${dts.dtFim}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         };
 
         let transacoesGlobais = [], transacoesFiltradas = []; 
@@ -629,7 +663,6 @@
             const tipoAbast = document.getElementById('filtroTipoAbast').value;
             transacoesFiltradas = transacoesGlobais.filter(t => tipoAbast === 'todos' ? true : t.tipoAbastecimento === tipoAbast);
 
-            // CORREÇÃO VISUAL: Atualiza o badge verde com a quantidade REAL filtrada
             const statusBox = document.getElementById('statusMsg');
             if (statusBox.className.includes('success') && transacoesGlobais.length > 0) {
                 statusBox.innerHTML = `✅ ${transacoesFiltradas.length} Listados (Banco Local)`;
@@ -836,7 +869,6 @@
             setTimeout(renderTabContent, 50); 
         });
 
-        // --- FETCH NO BANCO LOCAL ---
         async function fetchAPILocal() {
             const status = document.getElementById('statusMsg');
             const dates = getDatasFiltro();
@@ -858,7 +890,6 @@
             }
         }
 
-        // --- ACIONA O ROBÔ DA TRUCKPAG ---
         async function acionarRoboTruckPag() {
             const btn = document.getElementById('btnSyncApi');
             const dates = getDatasFiltro();
@@ -892,6 +923,7 @@
         document.getElementById('btnConectar').addEventListener('click', fetchAPILocal);
         document.getElementById('btnRecarregarTela').addEventListener('click', fetchAPILocal);
         document.getElementById('btnSyncApi').addEventListener('click', acionarRoboTruckPag);
+        document.getElementById('btnExportCSV').addEventListener('click', exportarCSV);
         
         document.getElementById('filtroTipoAbast').addEventListener('change', () => { if(transacoesGlobais.length>0){ processarDados(); renderTabContent(); } });
 
