@@ -138,7 +138,7 @@
         .toolbar-int input { flex:1; min-width:300px; padding:12px 15px; border-radius:6px; border:1px solid var(--border-color); background:var(--surface-color); color:var(--text-main); outline:none; font-size:14px; font-weight:600;}
         .toolbar-int input:focus { border-color: var(--chart-color-1); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);}
         
-        .btn-sync { padding:10px 15px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:6px; font-size:18px; width:46px; height:46px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;}
+        .btn-sync { padding:10px 15px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; transition:0.2s;}
         .btn-sync:hover { background:var(--border-color); transform: scale(1.05); }
         .btn-sync-api { padding:10px 15px; background:var(--brand-blue); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
         .btn-sync-api:hover { background:var(--brand-orange); }
@@ -415,9 +415,13 @@
                     <div class="toolbar-int">
                         <div style="display:flex; gap:10px; flex:1;">
                             <input type="text" id="intSearchInput" placeholder="🔍 Buscar por Data, Posto, Placa, NFe ou CNPJ...">
-                            <button class="btn-sync" id="btnRecarregarTela" title="Recarregar Dados Salvos do Banco Local">🔄</button>
+                            <!-- Botão mostrar erros removido -->
                         </div>
-                        <button class="btn-sync-api" id="btnSyncApi" title="Manda o Servidor buscar os dados na TruckPag em Lotes de 5 dias">☁️ Iniciar Carga da TruckPag</button>
+                        <div style="display:flex; gap:10px;">
+                            <!-- Botões de sincronização com visuais novos e limpos -->
+                            <button class="btn-sync" id="btnRecarregarTela" title="Atualiza a tela com os dados do banco local">🔄 Local</button>
+                            <button class="btn-sync-api" id="btnSyncApi" title="Manda o Servidor baixar os dados faltantes da TruckPag">⬇️ Nuvem</button>
+                        </div>
                     </div>
                     <table>
                         <thead>
@@ -796,6 +800,7 @@
                     }
                 }
 
+                // O Botão de baixar PDF
                 const btnPdf = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}')">📄 Visualizar / Baixar PDF</a></div>` : '';
 
                 tb.innerHTML += `<tr>
@@ -829,7 +834,7 @@
             setTimeout(renderTabContent, 50); 
         });
 
-        // --- FETCH NA API COM COMPORTAMENTO ASSÍNCRONO (NÃO TRAVA A TELA) ---
+        // --- FETCH NO BANCO LOCAL ---
         async function fetchAPILocal() {
             const status = document.getElementById('statusMsg');
             const dates = getDatasFiltro();
@@ -853,16 +858,16 @@
             }
         }
 
+        // --- ACIONA O ROBÔ DA TRUCKPAG ---
         async function acionarRoboTruckPag() {
             const btn = document.getElementById('btnSyncApi');
             const dates = getDatasFiltro();
             const BASE_API = apiUrlAtual || 'http://localhost:3000';
 
-            btn.innerHTML = '⏳ Servidor Processando...';
+            btn.innerHTML = '⏳ Servidor Baixando...';
             btn.style.background = '#f59e0b';
             
             try {
-                // Rota nova do Servidor que não trava o navegador
                 const response = await fetch(`${BASE_API}/api/forcar-sync-background`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -873,21 +878,19 @@
                 alert('🚀 ' + res.message);
                 
                 setTimeout(() => {
-                    btn.innerHTML = '☁️ Iniciar Carga da TruckPag';
+                    btn.innerHTML = '⬇️ Nuvem';
                     btn.style.background = 'var(--brand-blue)';
                 }, 3000);
 
             } catch(e) {
-                alert('❌ Erro de conexão ao tentar acionar a TruckPag. Verifique o servidor local.');
-                btn.innerHTML = '☁️ Iniciar Carga da TruckPag';
+                alert('❌ Erro de conexão ao tentar acionar a TruckPag.');
+                btn.innerHTML = '⬇️ Nuvem';
                 btn.style.background = 'var(--brand-blue)';
             }
         }
 
-        // Botões do Painel Principal
+        // Eventos dos botões
         document.getElementById('btnConectar').addEventListener('click', fetchAPILocal);
-        
-        // Botões da Aba Integração NFe
         document.getElementById('btnRecarregarTela').addEventListener('click', fetchAPILocal);
         document.getElementById('btnSyncApi').addEventListener('click', acionarRoboTruckPag);
         
