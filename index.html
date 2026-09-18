@@ -286,7 +286,6 @@
         </div>
     </div>
 
-    <!-- 4. SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <span>FILTROS DA FROTA</span>
@@ -335,7 +334,6 @@
         </div>
     </div>
 
-    <!-- 5. DASHBOARD MAIN -->
     <div class="main-content">
         <header class="top-header">
             <div class="header-left">
@@ -415,10 +413,8 @@
                     <div class="toolbar-int">
                         <div style="display:flex; gap:10px; flex:1;">
                             <input type="text" id="intSearchInput" placeholder="🔍 Buscar por Data, Posto, Placa, NFe ou CNPJ...">
-                            <!-- Botão mostrar erros removido -->
                         </div>
                         <div style="display:flex; gap:10px;">
-                            <!-- Botões de sincronização com visuais novos e limpos -->
                             <button class="btn-sync" id="btnRecarregarTela" title="Atualiza a tela com os dados do banco local">🔄 Local</button>
                             <button class="btn-sync-api" id="btnSyncApi" title="Manda o Servidor baixar os dados faltantes da TruckPag">⬇️ Nuvem</button>
                         </div>
@@ -599,7 +595,8 @@
             });
         };
 
-        let transacoesGlobais = [], transacoesFiltradas = [], todosPostos = [];
+        let transacoesGlobais = [], transacoesFiltradas = []; 
+        let todosPostos = [];
         let mapInstance = null, heatLayer = null, markersLayer = null;
 
         const coordsBrasil = {
@@ -631,6 +628,12 @@
             const precoRef = parseFloat(document.getElementById('precoReferenciaInput').value) || 7.18;
             const tipoAbast = document.getElementById('filtroTipoAbast').value;
             transacoesFiltradas = transacoesGlobais.filter(t => tipoAbast === 'todos' ? true : t.tipoAbastecimento === tipoAbast);
+
+            // CORREÇÃO VISUAL: Atualiza o badge verde com a quantidade REAL filtrada
+            const statusBox = document.getElementById('statusMsg');
+            if (statusBox.className.includes('success') && transacoesGlobais.length > 0) {
+                statusBox.innerHTML = `✅ ${transacoesFiltradas.length} Listados (Banco Local)`;
+            }
 
             const map = new Map();
             let volT = 0, cusT = 0, ecoT = 0, volDiesel = 0, volArla = 0;
@@ -800,7 +803,6 @@
                     }
                 }
 
-                // O Botão de baixar PDF
                 const btnPdf = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}')">📄 Visualizar / Baixar PDF</a></div>` : '';
 
                 tb.innerHTML += `<tr>
@@ -849,8 +851,6 @@
                 if(transacoesGlobais.length === 0) {
                     status.innerHTML = '⚠️ Nenhum dado no período (Banco Vazio)'; status.className = 'status-msg warning'; document.getElementById('kpiGrid').innerHTML = '';
                 } else {
-                    status.innerHTML = `✅ ${transacoesGlobais.length} Carregados (Banco Local)`;
-                    status.className = 'status-msg success';
                     processarDados(); renderTabContent(); 
                 }
             } catch (e) {
@@ -889,7 +889,6 @@
             }
         }
 
-        // Eventos dos botões
         document.getElementById('btnConectar').addEventListener('click', fetchAPILocal);
         document.getElementById('btnRecarregarTela').addEventListener('click', fetchAPILocal);
         document.getElementById('btnSyncApi').addEventListener('click', acionarRoboTruckPag);
