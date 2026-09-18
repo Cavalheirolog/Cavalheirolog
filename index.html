@@ -130,7 +130,7 @@
         .map-container { height: 650px; width: 100%; border-radius: 12px; overflow: hidden; position: relative; border:1px solid var(--border-color);}
         .map-floating-left { position: absolute; top: 15px; left: 15px; z-index: 1000; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 6px 20px rgba(0,0,0,0.15); width:260px; backdrop-filter: blur(5px);}
         [data-theme="dark"] .map-floating-left { background: rgba(15,23,42,0.95); border-color: #334155; color:#fff;}
-        .map-legenda { font-size:12px; font-weight:600; display:flex; justify-content:space-between; margin-top:8px; align-items:center; padding:4px 0;}
+        .map-legenda { font-size:13px; font-weight:600; display:flex; justify-content:space-between; margin-top:8px; align-items:center; padding:4px 0;}
         .map-search { width:100%; padding:10px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-main); margin-bottom:12px; outline:none; font-size:13px; font-weight:600;}
         .map-search:focus { border-color: var(--brand-orange); }
 
@@ -400,11 +400,27 @@
                         <div class="map-floating-left">
                             <span style="font-size:12px; font-weight:800; color:var(--brand-blue); text-transform:uppercase;">⚙️ Controles do Mapa</span><hr style="margin:8px 0; border-top:1px solid #ccc;">
                             <input type="text" id="mapSearch" class="map-search" placeholder="Pesquisar cidade ou posto...">
-                            <label style="font-size:13px; cursor:pointer; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:6px;"><input type="checkbox" id="toggleHeatmapCheck" checked style="width:16px;height:16px;"> 🔥 Mancha Calor</label>
-                            <div style="margin-top:15px; font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">📍 Pinos (ABC):</div>
-                            <div class="map-legenda"><span>Classe A (80%)</span> <span style="color:#10b981; font-size:18px;">●</span></div>
-                            <div class="map-legenda"><span>Classe B (15%)</span> <span style="color:#f59e0b; font-size:18px;">●</span></div>
-                            <div class="map-legenda"><span>Classe C (5%)</span> <span style="color:#ef4444; font-size:18px;">●</span></div>
+                            
+                            <label style="font-size:13px; cursor:pointer; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+                                <input type="checkbox" id="toggleHeatmapCheck" checked style="width:16px;height:16px;"> 🔥 Mancha de Calor
+                            </label>
+                            
+                            <div style="margin-top:15px; font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">📍 PINOS (ABC):</div>
+                            
+                            <!-- CAIXAS DE SELEÇÃO INTERATIVAS DAS CLASSES ABC NO MAPA -->
+                            <div class="map-legenda">
+                                <label style="cursor:pointer; display:flex; align-items:center;"><input type="checkbox" id="checkClasseA" checked style="margin-right:8px; width:14px; height:14px;"> Classe A (80%)</label> 
+                                <span style="color:#10b981; font-size:18px;">●</span>
+                            </div>
+                            <div class="map-legenda">
+                                <label style="cursor:pointer; display:flex; align-items:center;"><input type="checkbox" id="checkClasseB" checked style="margin-right:8px; width:14px; height:14px;"> Classe B (15%)</label> 
+                                <span style="color:#f59e0b; font-size:18px;">●</span>
+                            </div>
+                            <div class="map-legenda">
+                                <label style="cursor:pointer; display:flex; align-items:center;"><input type="checkbox" id="checkClasseC" checked style="margin-right:8px; width:14px; height:14px;"> Classe C (5%)</label> 
+                                <span style="color:#ef4444; font-size:18px;">●</span>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -597,7 +613,6 @@
             });
         };
 
-        // --- NOVA FUNÇÃO DE EXPORTAR CSV ---
         window.exportarCSV = function() {
             if (!transacoesFiltradas || transacoesFiltradas.length === 0) {
                 return alert("Nenhum dado na tela para exportar. Filtre primeiro.");
@@ -778,9 +793,20 @@
                 
                 const pts = []; markersLayer = L.layerGroup();
                 const termoBusca = document.getElementById('mapSearch').value.toUpperCase();
+                
+                // Puxa o status das checkboxes do Mapa para filtrar
+                const showA = document.getElementById('checkClasseA').checked;
+                const showB = document.getElementById('checkClasseB').checked;
+                const showC = document.getElementById('checkClasseC').checked;
 
                 todosPostos.forEach(p => {
+                    // Filtro de Texto
                     if(termoBusca && !p.posto.includes(termoBusca) && !p.cidade.includes(termoBusca)) return;
+                    
+                    // NOVA REGRA: Filtro interativo das checkboxes do mapa
+                    if(p.abc === 'A' && !showA) return;
+                    if(p.abc === 'B' && !showB) return;
+                    if(p.abc === 'C' && !showC) return;
 
                     let nomeCid = p.cidade ? p.cidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : '';
                     let baseCoord = coordsBrasil[nomeCid] || coordsEstados[p.uf] || { lat: -15.7, lng: -47.9 };
@@ -859,8 +885,13 @@
         }
         
         document.getElementById('intSearchInput').addEventListener('input', renderIntegrationTable);
+        
+        // --- EVENTOS DO MAPA (Tornam as checkboxes ativas em tempo real) ---
         document.getElementById('mapSearch').addEventListener('input', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
         document.getElementById('toggleHeatmapCheck').addEventListener('change', (e) => { if (!mapInstance || !heatLayer) return; if (e.target.checked) mapInstance.addLayer(heatLayer); else mapInstance.removeLayer(heatLayer); });
+        document.getElementById('checkClasseA').addEventListener('change', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseB').addEventListener('change', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseC').addEventListener('change', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
 
         document.getElementById('navTabs').addEventListener('click', e => {
             const b = e.target.closest('.nav-tab'); if(!b) return;
