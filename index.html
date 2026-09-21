@@ -329,8 +329,6 @@
                 </select>
             </div>
 
-            <!-- Preço de Referência foi removido para usar o valor real da Tabela (Banco de Dados) -->
-
             <button class="btn-filter-main" id="btnConectar" style="margin-top:15px;">FILTRAR AGORA</button>
             <div class="status-msg" id="statusMsg">Pronto para conectar</div>
         </div>
@@ -391,7 +389,6 @@
                 </div>
             </div>
 
-            <!-- NOVA ABA: ANÁLISE DE PREÇOS NEGOCIADOS -->
             <div id="tab-precos" class="tab-content">
                 <div class="table-wrap">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
@@ -548,7 +545,7 @@
                 const loginOverlay = document.getElementById('authOverlay');
                 loginOverlay.classList.add('animating-login');
                 sessionStorage.setItem('logged_user', user);
-                // Converter permissões antigas (stations) para a nova (precos) se necessário
+                
                 let uPerms = users[user].perms;
                 if(uPerms.stations !== undefined && uPerms.precos === undefined) { uPerms.precos = uPerms.stations; }
                 sessionStorage.setItem('user_perms', JSON.stringify(uPerms));
@@ -688,8 +685,28 @@
         }
 
         function processarDados() {
+            // INTELIGÊNCIA DE AUTO-CORREÇÃO (Resolve o bug do "Apenas Postos Externos" não funcionar)
+            // Se o banco não salvou corretamente se o posto é interno ou externo, ele deduz pelo nome!
+            transacoesGlobais.forEach(t => {
+                let estabDB = (t.estabelecimento || '').toUpperCase();
+                let tipoDB = (t.tipoAbastecimento || '').toUpperCase();
+                
+                if (!tipoDB.includes('INTERNO') && !tipoDB.includes('EXTERNO')) {
+                    t.tipoAbastecimento = estabDB.includes('INTERNA') ? 'Interno' : 'Externo';
+                }
+            });
+
             const tipoAbast = document.getElementById('filtroTipoAbast').value;
-            transacoesFiltradas = transacoesGlobais.filter(t => tipoAbast === 'todos' ? true : t.tipoAbastecimento === tipoAbast);
+            
+            // FILTRAGEM ULTRA-SEGURA
+            transacoesFiltradas = transacoesGlobais.filter(t => {
+                if (tipoAbast === 'todos') return true;
+                const tipoAtual = (t.tipoAbastecimento || '').toUpperCase();
+                
+                if (tipoAbast === 'Interno') return tipoAtual.includes('INTERNO');
+                if (tipoAbast === 'Externo') return tipoAtual.includes('EXTERNO');
+                return true;
+            });
 
             const statusBox = document.getElementById('statusMsg');
             if (statusBox.className.includes('success') && transacoesGlobais.length > 0) {
@@ -711,11 +728,11 @@
                 p.volume += vol; 
                 p.custo += val; 
 
-                // LÓGICA DA NOVA ECONOMIA BASEADA NO PREÇO REAL DA TABELA
+                // ECONOMIA COM BASE NA TABELA NEGOCIADA
                 if (precoTab > 0) {
                     p.custoTabela += (vol * precoTab);
                     p.volComTabela += vol;
-                    const eco = (vol * precoTab) - val; // Se paguei menos que a tabela, Economia Positiva!
+                    const eco = (vol * precoTab) - val; 
                     p.economia += eco;
                     ecoT += eco;
                 }
@@ -731,7 +748,7 @@
             todosPostos.forEach(p => {
                 p.precoMedio = p.volume > 0 ? p.custo / p.volume : 0;
                 p.precoTabelaMedio = p.volComTabela > 0 ? p.custoTabela / p.volComTabela : 0;
-                p.divergenciaLitro = p.precoTabelaMedio > 0 ? p.precoMedio - p.precoTabelaMedio : 0; // Positivo = Mais caro que a tabela
+                p.divergenciaLitro = p.precoTabelaMedio > 0 ? p.precoMedio - p.precoTabelaMedio : 0;
                 
                 acum += p.volume; p.percentualAcum = volT > 0 ? (acum / volT) * 100 : 0;
                 p.abc = p.percentualAcum <= 80 ? 'A' : (p.percentualAcum <= 95 ? 'B' : 'C'); 
@@ -801,7 +818,6 @@
                 });
             }
 
-            // FUSÃO PERFEITA: Curva ABC + Detalhamento de Postos
             if(activeTab === 'tab-abc') {
                 Chart.getChart('cAbcBar')?.destroy(); Chart.getChart('cAbcPie')?.destroy();
                 new Chart(document.getElementById('cAbcBar'), { type: 'bar', data: { labels: todosPostos.slice(0,30).map((_,i)=>i+1), datasets: [{ label: 'Vol.', data: todosPostos.slice(0,30).map(p=>p.volume), backgroundColor: todosPostos.slice(0,30).map(p=>p.abc==='A'?'#10b981':(p.abc==='B'?'#f59e0b':'#ef4444')) }] }, options: { maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip: tooltipAbc } } });
@@ -813,14 +829,13 @@
                 });
             }
 
-            // NOVA ABA: PREÇOS NEGOCIADOS (AUDITORIA)
             if(activeTab === 'tab-precos') {
                 const tb = document.getElementById('tbPrecos'); tb.innerHTML = '';
                 const postosPreco = [...todosPostos].filter(p => p.volComTabela > 0).sort((a, b) => b.volume - a.volume);
 
                 postosPreco.forEach((p, i) => {
-                    const diff = p.divergenciaLitro; // Quanto a mais pagou (Negativo = Abaixo da Tabela)
-                    const impacto = diff * p.volComTabela; // Prejuizo ou lucro
+                    const diff = p.divergenciaLitro; 
+                    const impacto = diff * p.volComTabela; 
                     
                     let statusHtml = '';
                     if (diff > 0.05) statusHtml = `<span class="badge red">🔴 Acima da Tabela</span>`;
@@ -840,7 +855,7 @@
                 });
 
                 if(postosPreco.length === 0) {
-                    tb.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px; color:var(--text-muted); font-weight:bold;">Nenhum abastecimento encontrado que possua Preço de Tabela homologado no período selecionado.<br>Certifique-se de importar o arquivo de histórico de preços mais recente.</td></tr>`;
+                    tb.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px; color:var(--text-muted); font-weight:bold;">Nenhum abastecimento encontrado que possua Preço de Tabela homologado no período selecionado.</td></tr>`;
                 }
             }
 
@@ -945,11 +960,11 @@
         
         document.getElementById('intSearchInput').addEventListener('input', renderIntegrationTable);
         
-        document.getElementById('mapSearch').addEventListener('input', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('mapSearch').addEventListener('input', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
         document.getElementById('toggleHeatmapCheck').addEventListener('change', (e) => { if (!mapInstance || !heatLayer) return; if (e.target.checked) mapInstance.addLayer(heatLayer); else mapInstance.removeLayer(heatLayer); });
-        document.getElementById('checkClasseA').addEventListener('change', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
-        document.getElementById('checkClasseB').addEventListener('change', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
-        document.getElementById('checkClasseC').addEventListener('change', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseA').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseB').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseC').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
 
         document.getElementById('navTabs').addEventListener('click', e => {
             const b = e.target.closest('.nav-tab'); if(!b) return;
