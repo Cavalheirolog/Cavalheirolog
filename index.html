@@ -37,7 +37,7 @@
         body { background: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
         .tooltip-container { position: relative; cursor: help; }
-        .tooltip-box { visibility: hidden; opacity: 0; width: 280px; background-color: #1e293b; color: #fff; text-align: left; border-radius: 8px; padding: 12px; position: absolute; z-index: 1000; bottom: 120%; left: 50%; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 11px; font-weight: normal; transition: opacity 0.3s, bottom 0.3s; line-height: 1.5; pointer-events: none;}
+        .tooltip-box { visibility: hidden; opacity: 0; width: 300px; background-color: #1e293b; color: #fff; text-align: left; border-radius: 8px; padding: 12px; position: absolute; z-index: 1000; bottom: 120%; left: 50%; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 11px; font-weight: normal; transition: opacity 0.3s, bottom 0.3s; line-height: 1.5; pointer-events: none;}
         .tooltip-box::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent; }
         .tooltip-container:hover .tooltip-box { visibility: visible; opacity: 1; bottom: 130%; }
 
@@ -235,8 +235,8 @@
                     <div class="perm-grid">
                         <label><input type="checkbox" id="p_overview" checked> Visão Geral</label>
                         <label><input type="checkbox" id="p_temporal" checked> Evolução</label>
-                        <label><input type="checkbox" id="p_abc" checked> Curva ABC</label>
-                        <label><input type="checkbox" id="p_stations" checked> Postos</label>
+                        <label><input type="checkbox" id="p_abc" checked> Curva ABC & Ranking</label>
+                        <label><input type="checkbox" id="p_precos" checked> Preços Negociados</label>
                         <label><input type="checkbox" id="p_heatmap" checked> Mapa Híbrido</label>
                         <label><input type="checkbox" id="p_integration" checked> Integração NFe</label>
                     </div>
@@ -329,9 +329,9 @@
                 </select>
             </div>
 
-            <div class="field" style="margin-top:6px;"><label>💰 Preço Ref. (R$)</label><input type="number" id="precoReferenciaInput" step="0.01" value="7.18"></div>
-            
-            <button class="btn-filter-main" id="btnConectar" style="margin-top:8px;">FILTRAR AGORA</button>
+            <!-- Preço de Referência foi removido para usar o valor real da Tabela (Banco de Dados) -->
+
+            <button class="btn-filter-main" id="btnConectar" style="margin-top:15px;">FILTRAR AGORA</button>
             <div class="status-msg" id="statusMsg">Pronto para conectar</div>
         </div>
     </div>
@@ -356,8 +356,8 @@
             <div class="nav-tabs" id="navTabs">
                 <button class="nav-tab" data-tab="tab-overview" id="btn_t_overview">📊 Visão Geral</button>
                 <button class="nav-tab" data-tab="tab-temporal" id="btn_t_temporal">📈 Evolução Analítica</button>
-                <button class="nav-tab" data-tab="tab-abc" id="btn_t_abc">📉 Curva ABC</button>
-                <button class="nav-tab" data-tab="tab-stations" id="btn_t_stations">🏢 Análise Postos</button>
+                <button class="nav-tab" data-tab="tab-abc" id="btn_t_abc">📉 Curva ABC & Ranking</button>
+                <button class="nav-tab" data-tab="tab-precos" id="btn_t_precos">💲 Preços Negociados</button>
                 <button class="nav-tab" data-tab="tab-heatmap" id="btn_t_heatmap">🔥 Mapa Híbrido</button>
                 <button class="nav-tab" data-tab="tab-integration" id="btn_t_integration">🔗 Integração NFe</button>
             </div>
@@ -367,7 +367,7 @@
             <div id="tab-overview" class="tab-content">
                 <div class="charts-grid" style="grid-template-columns: 1fr;" id="box_topvol"><div class="chart-box"><h3>🏆 Top 10 Postos (Volume)</h3><div class="chart-container"><canvas id="cTopVol"></canvas></div></div></div>
                 <div class="charts-grid">
-                    <div class="chart-box" id="box_topeco"><h3>💰 Top 10 Postos (Economia)</h3><div class="chart-container"><canvas id="cTopEco"></canvas></div></div>
+                    <div class="chart-box" id="box_topeco"><h3>💰 Top 10 Postos (Economia Real)</h3><div class="chart-container"><canvas id="cTopEco"></canvas></div></div>
                     <div class="chart-box" id="box_classabc"><h3>📊 Postos por Classe ABC</h3><div class="chart-container"><canvas id="cClassABC"></canvas></div></div>
                 </div>
             </div>
@@ -384,12 +384,37 @@
             <div id="tab-abc" class="tab-content">
                 <div class="charts-grid" style="grid-template-columns: 1fr;"><div class="chart-box"><h3>📊 Curva ABC Concentração</h3><div class="chart-container"><canvas id="cAbcBar"></canvas></div></div></div>
                 <div class="charts-grid" style="grid-template-columns: 1fr;"><div class="chart-box"><h3>📊 Volume por Classe</h3><div class="chart-container"><canvas id="cAbcPie"></canvas></div></div></div>
+                
+                <div class="table-wrap">
+                    <h3>🏢 Ranking Detalhado da Frota</h3><br>
+                    <table><thead><tr><th>Rank</th><th>Posto</th><th>Cidade/UF</th><th class="text-right">Volume (L)</th><th class="text-right">Preço Médio Pago</th><th class="text-right">Custo Total</th><th class="text-right">Economia Real</th><th class="text-center">Classe ABC</th></tr></thead><tbody id="tbPostos"></tbody></table>
+                </div>
             </div>
 
-            <div id="tab-stations" class="tab-content">
+            <!-- NOVA ABA: ANÁLISE DE PREÇOS NEGOCIADOS -->
+            <div id="tab-precos" class="tab-content">
                 <div class="table-wrap">
-                    <h3>🏢 Ranking Detalhado</h3><br>
-                    <table><thead><tr><th>Rank</th><th>Posto</th><th>Cidade/UF</th><th class="text-right">Volume (L)</th><th class="text-right">Preço Médio</th><th class="text-right">Custo Total</th><th class="text-right">Economia Real</th><th class="text-center">ABC</th></tr></thead><tbody id="tbPostos"></tbody></table>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <div>
+                            <h3 style="display:inline-block;">💲 Análise de Divergência de Preços (Postos Negociados)</h3>
+                            <p style="font-size:12px; color:var(--text-muted); margin-top:5px; font-weight:600;">Compara o preço médio pago na bomba com o preço da tabela negociada registrado na TruckPag para aquele dia.</p>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Posto Homologado</th>
+                                <th class="text-right">Volume Analisado</th>
+                                <th class="text-right">Preço Negociado (Tabela)</th>
+                                <th class="text-right">Preço Médio Pago</th>
+                                <th class="text-right">Divergência (R$ / Litro)</th>
+                                <th class="text-right">Impacto Financeiro</th>
+                                <th class="text-center">Status de Auditoria</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbPrecos"></tbody>
+                    </table>
                 </div>
             </div>
             
@@ -407,7 +432,6 @@
                             
                             <div style="margin-top:15px; font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">📍 PINOS (ABC):</div>
                             
-                            <!-- CAIXAS DE SELEÇÃO INTERATIVAS DAS CLASSES ABC NO MAPA -->
                             <div class="map-legenda">
                                 <label style="cursor:pointer; display:flex; align-items:center;"><input type="checkbox" id="checkClasseA" checked style="margin-right:8px; width:14px; height:14px;"> Classe A (80%)</label> 
                                 <span style="color:#10b981; font-size:18px;">●</span>
@@ -420,7 +444,6 @@
                                 <label style="cursor:pointer; display:flex; align-items:center;"><input type="checkbox" id="checkClasseC" checked style="margin-right:8px; width:14px; height:14px;"> Classe C (5%)</label> 
                                 <span style="color:#ef4444; font-size:18px;">●</span>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -434,7 +457,7 @@
                         </div>
                         <div style="display:flex; gap:10px;">
                             <button class="btn-sync" id="btnRecarregarTela" title="Atualiza a tela com os dados do banco local">🔄 Local</button>
-                            <button class="btn-sync-api" id="btnSyncApi" title="Manda o Servidor baixar os dados faltantes da TruckPag">⬇️ Nuvem</button>
+                            <button class="btn-sync-api" id="btnSyncApi" title="O Radar roda a cada 3 min, mas você pode forçar agora">⬇️ Nuvem</button>
                             <button class="btn-export" id="btnExportCSV" title="Exporta os dados filtrados em CSV para o Excel">📥 Exportar CSV</button>
                         </div>
                     </div>
@@ -488,9 +511,9 @@
             }
 
             document.getElementById('settingsModal').style.display = 'none';
-            if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-overview') renderTabContent();
+            if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-overview') renderTabContent();
             
-            document.getElementById('statusMsg').innerHTML = 'Configurações e URL atualizadas!';
+            document.getElementById('statusMsg').innerHTML = 'Configurações atualizadas!';
             document.getElementById('statusMsg').className = 'status-msg success';
         };
 
@@ -505,7 +528,7 @@
         async function initDBUsuarios() {
             let users = JSON.parse(localStorage.getItem('cavalheiro_users') || '{}');
             if (!users[MASTER_ADMIN]) {
-                users[MASTER_ADMIN] = { hash: await hashPassword('Log2026@'), isAdmin: true, perms: { overview: true, temporal: true, abc: true, stations: true, heatmap: true, integration: true } };
+                users[MASTER_ADMIN] = { hash: await hashPassword('Log2026@'), isAdmin: true, perms: { overview: true, temporal: true, abc: true, precos: true, heatmap: true, integration: true } };
                 localStorage.setItem('cavalheiro_users', JSON.stringify(users));
             }
             
@@ -525,7 +548,10 @@
                 const loginOverlay = document.getElementById('authOverlay');
                 loginOverlay.classList.add('animating-login');
                 sessionStorage.setItem('logged_user', user);
-                sessionStorage.setItem('user_perms', JSON.stringify(users[user].perms));
+                // Converter permissões antigas (stations) para a nova (precos) se necessário
+                let uPerms = users[user].perms;
+                if(uPerms.stations !== undefined && uPerms.precos === undefined) { uPerms.precos = uPerms.stations; }
+                sessionStorage.setItem('user_perms', JSON.stringify(uPerms));
                 
                 setTimeout(() => {
                     loginOverlay.style.opacity = '0';
@@ -546,7 +572,7 @@
                 hash: await hashPassword(newPass), isAdmin: false,
                 perms: {
                     overview: document.getElementById('p_overview').checked, temporal: document.getElementById('p_temporal').checked,
-                    abc: document.getElementById('p_abc').checked, stations: document.getElementById('p_stations').checked,
+                    abc: document.getElementById('p_abc').checked, precos: document.getElementById('p_precos').checked,
                     heatmap: document.getElementById('p_heatmap').checked, integration: document.getElementById('p_integration').checked
                 }
             };
@@ -608,40 +634,28 @@
                 alert('✅ CHAVE DA NOTA COPIADA COM SUCESSO!\n\nO portal será aberto agora. Basta clicar na barra de pesquisa, apertar "Colar" (ou Ctrl+V) e você poderá visualizar e baixar o PDF.');
                 window.open('https://www.fsist.com.br/', '_blank');
             }).catch(err => {
-                prompt('Seu navegador bloqueou a cópia automática. Por favor, copie a chave abaixo e cole no portal que será aberto:', chave);
+                prompt('Seu navegador bloqueou a cópia automática. Copie a chave abaixo e cole no portal que será aberto:', chave);
                 window.open('https://www.fsist.com.br/', '_blank');
             });
         };
 
         window.exportarCSV = function() {
-            if (!transacoesFiltradas || transacoesFiltradas.length === 0) {
-                return alert("Nenhum dado na tela para exportar. Filtre primeiro.");
-            }
-            
-            let csv = "Data;Transacao;Posto;Cidade;UF;Tipo Abastecimento;Placa;Motorista;Volume(L);Valor Total(R$);Valor Litro(R$);Status NFe;Chave NFe;CNPJ Posto;CNPJ Cliente;Combustivel\n";
-            
+            if (!transacoesFiltradas || transacoesFiltradas.length === 0) return alert("Nenhum dado na tela para exportar.");
+            let csv = "Data;Transacao;Posto;Cidade;UF;Tipo Abastecimento;Placa;Motorista;Volume(L);Valor Total(R$);Valor Litro(R$);Preco Tabela(R$);Status NFe;Chave NFe;CNPJ Posto;CNPJ Cliente;Combustivel\n";
             transacoesFiltradas.forEach(t => {
                 const dtStr = t.data ? t.data.split(' ')[0].split('-').reverse().join('/') : 'ND';
                 const row = [
-                    dtStr, t.id, `"${t.estabelecimento}"`, `"${t.cidade}"`, t.uf, 
-                    t.tipoAbastecimento, t.placa, `"${t.motorista}"`, 
-                    String(t.volume).replace('.', ','), 
-                    String(t.valor_total).replace('.', ','), 
-                    String(t.valor_litro).replace('.', ','), 
-                    t.status_nfe, t.chave_nfe, t.cnpj_posto, t.cnpj_cliente, t.combustivel
+                    dtStr, t.id, `"${t.estabelecimento}"`, `"${t.cidade}"`, t.uf, t.tipoAbastecimento, t.placa, `"${t.motorista}"`, 
+                    String(t.volume).replace('.', ','), String(t.valor_total).replace('.', ','), String(t.valor_litro).replace('.', ','), 
+                    String(t.preco_tabela||0).replace('.', ','), t.status_nfe, t.chave_nfe, t.cnpj_posto, t.cnpj_cliente, t.combustivel
                 ];
                 csv += row.join(";") + "\n";
             });
-            
             const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); 
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            const dts = getDatasFiltro();
-            link.setAttribute("href", url);
+            const link = document.createElement("a"); const dts = getDatasFiltro();
+            link.setAttribute("href", URL.createObjectURL(blob));
             link.setAttribute("download", `auditoria_cavalheirolog_${dts.dtIni}_ate_${dts.dtFim}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         };
 
         let transacoesGlobais = [], transacoesFiltradas = []; 
@@ -674,7 +688,6 @@
         }
 
         function processarDados() {
-            const precoRef = parseFloat(document.getElementById('precoReferenciaInput').value) || 7.18;
             const tipoAbast = document.getElementById('filtroTipoAbast').value;
             transacoesFiltradas = transacoesGlobais.filter(t => tipoAbast === 'todos' ? true : t.tipoAbastecimento === tipoAbast);
 
@@ -688,12 +701,26 @@
 
             transacoesFiltradas.forEach(t => {
                 const key = t.estabelecimento || 'POSTO ND';
-                if (!map.has(key)) map.set(key, { posto: key, cidade: t.cidade||'ND', uf: t.uf||'ND', cnpj_posto: t.cnpj_posto, volume: 0, custo: 0, economia: 0 });
+                if (!map.has(key)) map.set(key, { posto: key, cidade: t.cidade||'ND', uf: t.uf||'ND', cnpj_posto: t.cnpj_posto, volume: 0, custo: 0, economia: 0, custoTabela: 0, volComTabela: 0 });
                 const p = map.get(key);
                 
-                const vol = t.volume || 0;
-                p.volume += vol; p.custo += t.valor_total; p.economia += vol * (precoRef - t.valor_litro);
-                volT += vol; cusT += t.valor_total; ecoT += vol * (precoRef - t.valor_litro);
+                const vol = parseFloat(t.volume) || 0;
+                const val = parseFloat(t.valor_total) || 0;
+                const precoTab = parseFloat(t.preco_tabela) || 0;
+
+                p.volume += vol; 
+                p.custo += val; 
+
+                // LÓGICA DA NOVA ECONOMIA BASEADA NO PREÇO REAL DA TABELA
+                if (precoTab > 0) {
+                    p.custoTabela += (vol * precoTab);
+                    p.volComTabela += vol;
+                    const eco = (vol * precoTab) - val; // Se paguei menos que a tabela, Economia Positiva!
+                    p.economia += eco;
+                    ecoT += eco;
+                }
+
+                volT += vol; cusT += val;
 
                 const comb = (t.combustivel || '').toUpperCase();
                 if (comb.includes('ARLA')) volArla += vol; else volDiesel += vol;
@@ -703,6 +730,9 @@
             let acum = 0;
             todosPostos.forEach(p => {
                 p.precoMedio = p.volume > 0 ? p.custo / p.volume : 0;
+                p.precoTabelaMedio = p.volComTabela > 0 ? p.custoTabela / p.volComTabela : 0;
+                p.divergenciaLitro = p.precoTabelaMedio > 0 ? p.precoMedio - p.precoTabelaMedio : 0; // Positivo = Mais caro que a tabela
+                
                 acum += p.volume; p.percentualAcum = volT > 0 ? (acum / volT) * 100 : 0;
                 p.abc = p.percentualAcum <= 80 ? 'A' : (p.percentualAcum <= 95 ? 'B' : 'C'); 
             });
@@ -716,14 +746,15 @@
                 <div class="kpi-card"><div class="label">Custo Total Pago</div><div class="value">R$ ${fmt(cusT)}</div></div>
                 <div class="kpi-card highlight tooltip-container">
                     <div class="label">Economia Real ℹ️</div><div class="value">R$ ${fmt(ecoT)}</div>
-                    <div class="tooltip-box"><b>Cálculo de Economia:</b><br>Soma da litragem abastecida (volume) multiplicada pela diferença entre o "Preço de Referência (${precoRef})" configurado nos filtros e o Preço Médio pago na bomba.<br><br><i>Fórmula: Volume x (Ref - Preço Pago)</i></div>
+                    <div class="tooltip-box"><b>Cálculo Financeiro Exato:</b><br>Soma da litragem multiplicada pela diferença entre o <b>Preço Negociado</b> (cadastrado no histórico da TruckPag) e o Preço Médio pago na bomba no dia da nota.<br><br><i>Notas sem preço de tabela registrado não entram neste cálculo.</i></div>
                 </div>
             `;
         }
 
         function renderTabContent() {
             if(todosPostos.length === 0) return;
-            const activeTab = document.querySelector('.nav-tab.active').dataset.tab;
+            const activeTab = document.querySelector('.nav-tab.active')?.dataset.tab;
+            if(!activeTab) return;
             const color = cfgColor; 
             
             const tooltipAbc = { callbacks: { title: function(ctx) { return todosPostos[ctx[0].dataIndex].posto; } } };
@@ -757,28 +788,60 @@
                         labels: dKeys, 
                         datasets: [
                             { type: 'bar', label: 'Volume (L)', data: dKeys.map(k=>evoMap.get(k).vol), backgroundColor: color, yAxisID: 'y', order: 2, borderRadius: 4 },
-                            { type: 'line', label: 'Preço Médio (R$)', data: dKeys.map(k=>evoMap.get(k).custo/evoMap.get(k).vol), borderColor: '#ff4500', backgroundColor: '#ff4500', borderWidth:3, pointRadius:5, pointHoverRadius:8, yAxisID: 'y1', order: 1 }
+                            { type: 'line', label: 'Preço Médio Pago (R$)', data: dKeys.map(k=>evoMap.get(k).custo/evoMap.get(k).vol), borderColor: '#ff4500', backgroundColor: '#ff4500', borderWidth:3, pointRadius:5, pointHoverRadius:8, yAxisID: 'y1', order: 1 }
                         ] 
                     }, 
                     options: { 
                         maintainAspectRatio: false, plugins: { legend: { position: 'top' } },
                         scales: { 
                             y: { type: 'linear', position: 'left', title: {display: true, text: 'Volume (L)'} }, 
-                            y1: { type: 'linear', position: 'right', title: {display: true, text: 'Preço (R$)'}, grid: {drawOnChartArea: false} } 
+                            y1: { type: 'linear', position: 'right', title: {display: true, text: 'Preço Pago (R$)'}, grid: {drawOnChartArea: false} } 
                         } 
                     }
                 });
             }
 
+            // FUSÃO PERFEITA: Curva ABC + Detalhamento de Postos
             if(activeTab === 'tab-abc') {
                 Chart.getChart('cAbcBar')?.destroy(); Chart.getChart('cAbcPie')?.destroy();
                 new Chart(document.getElementById('cAbcBar'), { type: 'bar', data: { labels: todosPostos.slice(0,30).map((_,i)=>i+1), datasets: [{ label: 'Vol.', data: todosPostos.slice(0,30).map(p=>p.volume), backgroundColor: todosPostos.slice(0,30).map(p=>p.abc==='A'?'#10b981':(p.abc==='B'?'#f59e0b':'#ef4444')) }] }, options: { maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip: tooltipAbc } } });
                 new Chart(document.getElementById('cAbcPie'), { type: 'doughnut', data: { labels: ['A (80%)', 'B (15%)', 'C (5%)'], datasets: [{ data: [todosPostos.filter(p=>p.abc==='A').reduce((a,b)=>a+b.volume,0), todosPostos.filter(p=>p.abc==='B').reduce((a,b)=>a+b.volume,0), todosPostos.filter(p=>p.abc==='C').reduce((a,b)=>a+b.volume,0)], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'] }] }, options:{maintainAspectRatio:false}});
+                
+                const tb = document.getElementById('tbPostos'); tb.innerHTML = '';
+                todosPostos.forEach((p, i) => { 
+                    tb.innerHTML += `<tr><td>${i+1}</td><td><b>${p.posto}</b></td><td>${p.cidade}/${p.uf}</td><td class="text-right">${fmt(p.volume)}</td><td class="text-right">R$ ${fmt(p.precoMedio)}</td><td class="text-right">R$ ${fmt(p.custo)}</td><td class="text-right" style="color:${p.economia>=0?'var(--success)':'var(--danger)'}">R$ ${fmt(p.economia)}</td><td class="text-center"><b><span style="color:${p.abc==='A'?'#10b981':(p.abc==='B'?'#f59e0b':'#ef4444')}">${p.abc}</span></b></td></tr>`; 
+                });
             }
 
-            if(activeTab === 'tab-stations') {
-                const tb = document.getElementById('tbPostos'); tb.innerHTML = '';
-                todosPostos.forEach((p, i) => { tb.innerHTML += `<tr><td>${i+1}</td><td><b>${p.posto}</b></td><td>${p.cidade}/${p.uf}</td><td class="text-right">${fmt(p.volume)}</td><td class="text-right">R$ ${fmt(p.precoMedio)}</td><td class="text-right">R$ ${fmt(p.custo)}</td><td class="text-right" style="color:${p.economia>=0?'var(--success)':'var(--danger)'}">R$ ${fmt(p.economia)}</td><td class="text-center"><b><span style="color:${p.abc==='A'?'#10b981':(p.abc==='B'?'#f59e0b':'#ef4444')}">${p.abc}</span></b></td></tr>`; });
+            // NOVA ABA: PREÇOS NEGOCIADOS (AUDITORIA)
+            if(activeTab === 'tab-precos') {
+                const tb = document.getElementById('tbPrecos'); tb.innerHTML = '';
+                const postosPreco = [...todosPostos].filter(p => p.volComTabela > 0).sort((a, b) => b.volume - a.volume);
+
+                postosPreco.forEach((p, i) => {
+                    const diff = p.divergenciaLitro; // Quanto a mais pagou (Negativo = Abaixo da Tabela)
+                    const impacto = diff * p.volComTabela; // Prejuizo ou lucro
+                    
+                    let statusHtml = '';
+                    if (diff > 0.05) statusHtml = `<span class="badge red">🔴 Acima da Tabela</span>`;
+                    else if (diff < -0.05) statusHtml = `<span class="badge green">🟢 Abaixo da Tabela</span>`;
+                    else statusHtml = `<span class="badge" style="background:#e2e8f0; color:#475569;">⚪ Dentro da Tabela</span>`;
+
+                    tb.innerHTML += `<tr>
+                        <td>${i+1}</td>
+                        <td><b>${p.posto}</b><br><small style="color:var(--text-muted)">${p.cidade}/${p.uf}</small></td>
+                        <td class="text-right">${fmt(p.volComTabela)} L</td>
+                        <td class="text-right" style="color:var(--brand-blue); font-weight:800;">R$ ${fmt(p.precoTabelaMedio)}</td>
+                        <td class="text-right"><b>R$ ${fmt(p.precoMedio)}</b></td>
+                        <td class="text-right" style="color:${diff>0?'var(--danger)':'var(--success)'}; font-weight:bold;">${diff>0?'+':''}R$ ${fmt(diff)}</td>
+                        <td class="text-right" style="color:${impacto>0?'var(--danger)':'var(--success)'}; font-weight:bold;">R$ ${fmt(Math.abs(impacto))}</td>
+                        <td class="text-center">${statusHtml}</td>
+                    </tr>`;
+                });
+
+                if(postosPreco.length === 0) {
+                    tb.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px; color:var(--text-muted); font-weight:bold;">Nenhum abastecimento encontrado que possua Preço de Tabela homologado no período selecionado.<br>Certifique-se de importar o arquivo de histórico de preços mais recente.</td></tr>`;
+                }
             }
 
             if(activeTab === 'tab-heatmap') {
@@ -794,16 +857,12 @@
                 const pts = []; markersLayer = L.layerGroup();
                 const termoBusca = document.getElementById('mapSearch').value.toUpperCase();
                 
-                // Puxa o status das checkboxes do Mapa para filtrar
                 const showA = document.getElementById('checkClasseA').checked;
                 const showB = document.getElementById('checkClasseB').checked;
                 const showC = document.getElementById('checkClasseC').checked;
 
                 todosPostos.forEach(p => {
-                    // Filtro de Texto
                     if(termoBusca && !p.posto.includes(termoBusca) && !p.cidade.includes(termoBusca)) return;
-                    
-                    // NOVA REGRA: Filtro interativo das checkboxes do mapa
                     if(p.abc === 'A' && !showA) return;
                     if(p.abc === 'B' && !showB) return;
                     if(p.abc === 'C' && !showC) return;
@@ -886,7 +945,6 @@
         
         document.getElementById('intSearchInput').addEventListener('input', renderIntegrationTable);
         
-        // --- EVENTOS DO MAPA (Tornam as checkboxes ativas em tempo real) ---
         document.getElementById('mapSearch').addEventListener('input', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
         document.getElementById('toggleHeatmapCheck').addEventListener('change', (e) => { if (!mapInstance || !heatLayer) return; if (e.target.checked) mapInstance.addLayer(heatLayer); else mapInstance.removeLayer(heatLayer); });
         document.getElementById('checkClasseA').addEventListener('change', () => { if(document.querySelector('.nav-tab.active').dataset.tab === 'tab-heatmap') renderTabContent(); });
@@ -926,28 +984,21 @@
             const dates = getDatasFiltro();
             const BASE_API = apiUrlAtual || 'http://localhost:3000';
 
-            btn.innerHTML = '⏳ Servidor Baixando...';
+            btn.innerHTML = '⏳ Servidor Sincronizando...';
             btn.style.background = '#f59e0b';
             
             try {
                 const response = await fetch(`${BASE_API}/api/forcar-sync-background`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dates)
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dates)
                 });
-                
                 const res = await response.json();
                 alert('🚀 ' + res.message);
                 
-                setTimeout(() => {
-                    btn.innerHTML = '⬇️ Nuvem';
-                    btn.style.background = 'var(--brand-blue)';
-                }, 3000);
+                setTimeout(() => { btn.innerHTML = '⬇️ Nuvem'; btn.style.background = 'var(--brand-blue)'; }, 3000);
 
             } catch(e) {
                 alert('❌ Erro de conexão ao tentar acionar a TruckPag.');
-                btn.innerHTML = '⬇️ Nuvem';
-                btn.style.background = 'var(--brand-blue)';
+                btn.innerHTML = '⬇️ Nuvem'; btn.style.background = 'var(--brand-blue)';
             }
         }
 
@@ -985,7 +1036,7 @@
                 if(perms.overview) document.getElementById('btn_t_overview').style.display = 'block';
                 if(perms.temporal) document.getElementById('btn_t_temporal').style.display = 'block';
                 if(perms.abc) document.getElementById('btn_t_abc').style.display = 'block';
-                if(perms.stations) document.getElementById('btn_t_stations').style.display = 'block';
+                if(perms.precos) document.getElementById('btn_t_precos').style.display = 'block';
                 if(perms.heatmap) document.getElementById('btn_t_heatmap').style.display = 'block';
                 if(perms.integration) document.getElementById('btn_t_integration').style.display = 'block';
                 if(user === MASTER_ADMIN) document.getElementById('btnOpenAdmin').style.display = 'block';
