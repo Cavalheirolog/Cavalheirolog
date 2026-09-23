@@ -36,6 +36,13 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
         body { background: var(--bg-color); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--brand-blue); color: white; padding: 15px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; animation: slideInRight 0.3s ease forwards; max-width: 350px;}
+        .toast.success { border-left: 5px solid var(--success); }
+        .toast.error { border-left: 5px solid var(--danger); }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
+
         .tooltip-container { position: relative; cursor: help; }
         .tooltip-box { visibility: hidden; opacity: 0; width: 300px; background-color: #1e293b; color: #fff; text-align: left; border-radius: 8px; padding: 12px; position: absolute; z-index: 1000; bottom: 120%; left: 50%; transform: translateX(-50%); box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 11px; font-weight: normal; transition: opacity 0.3s, bottom 0.3s; line-height: 1.5; pointer-events: none;}
         .tooltip-box::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -6px; border-width: 6px; border-style: solid; border-color: #1e293b transparent transparent transparent; }
@@ -55,9 +62,7 @@
         .auth-field input, .auth-field select { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; padding: 12px; font-size: 14px; outline: none; }
         .auth-btn { background: var(--brand-orange); color: #fff; border: none; padding: 14px; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform:uppercase; transition: 0.3s; letter-spacing: 0.5px;}
         .auth-btn:hover { background: var(--brand-orange-hover); transform: translateY(-2px);}
-        .auth-alert { font-size: 12px; padding: 12px; border-radius: 6px; text-align: center; display: none; }
-        .auth-alert.error { display: block; background: rgba(220,53,69,0.1); color: var(--danger); border: 1px solid rgba(220,53,69,0.3); }
-
+        
         .perm-grid { display:grid; grid-template-columns: 1fr 1fr; gap:8px; background:var(--bg-color); padding:12px; border-radius:8px; border:1px solid var(--border-color); }
         .perm-grid label { display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; cursor:pointer;}
 
@@ -67,7 +72,6 @@
         .toggle-btn { background:transparent; border:1px solid rgba(255,255,255,0.2); color:white; width:30px; height:30px; border-radius:6px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; transition: 0.2s;}
         .toggle-btn:hover { background:var(--brand-orange); border-color:var(--brand-orange);}
         .btn-open-sidebar { display:none; background:var(--brand-orange); border:none; color:white; padding:8px 14px; border-radius:6px; cursor:pointer; font-weight:bold; font-size:12px;}
-        .toggle-btn-mobile { display:none; }
 
         .filter-section { display: flex; flex-direction: column; gap: 12px; background: var(--sidebar-panel); padding: 18px; border-radius: 12px; border: 1px solid var(--input-border); min-width:260px;}
         .field { display: flex; flex-direction: column; gap: 5px; }
@@ -77,6 +81,7 @@
         .field select option { background: #1e293b; color: #fff; }
         .btn-filter-main { padding: 14px; background: var(--brand-orange); color: #fff; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform:uppercase; letter-spacing: 1px; transition: 0.2s;}
         .btn-filter-main:hover { background: var(--brand-orange-hover); transform: translateY(-1px);}
+        
         .status-msg { font-size: 12px; padding: 12px; border-radius: 6px; text-align: center; font-weight: 700; margin-top:5px; transition: 0.3s;}
         .status-msg.success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
         .status-msg.warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
@@ -132,11 +137,9 @@
         [data-theme="dark"] .map-floating-left { background: rgba(15,23,42,0.95); border-color: #334155; color:#fff;}
         .map-legenda { font-size:13px; font-weight:600; display:flex; justify-content:space-between; margin-top:8px; align-items:center; padding:4px 0;}
         .map-search { width:100%; padding:10px; border-radius:6px; border:1px solid var(--border-color); background:var(--bg-color); color:var(--text-main); margin-bottom:12px; outline:none; font-size:13px; font-weight:600;}
-        .map-search:focus { border-color: var(--brand-orange); }
-
+        
         .toolbar-int { display:flex; gap:10px; margin-bottom: 20px; align-items:center; justify-content:space-between; background:var(--bg-color); padding:10px; border-radius:8px; border:1px solid var(--border-color);}
         .toolbar-int input { flex:1; min-width:300px; padding:12px 15px; border-radius:6px; border:1px solid var(--border-color); background:var(--surface-color); color:var(--text-main); outline:none; font-size:14px; font-weight:600;}
-        .toolbar-int input:focus { border-color: var(--chart-color-1); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);}
         
         .btn-sync { padding:10px 15px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; transition:0.2s;}
         .btn-sync:hover { background:var(--border-color); transform: scale(1.05); }
@@ -145,12 +148,11 @@
         .btn-export { padding:10px 15px; background:#10b981; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
         .btn-export:hover { background:#059669; }
 
-        .status-box { display:flex; flex-direction:column; gap:6px; }
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; width:max-content; }
         .badge.green { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
         .badge.red { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
         .badge.warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
-        
+
         .nfe-links { display:flex; gap:8px; margin-top:5px; }
         .btn-nfe { background:var(--brand-blue); color:white; border:none; padding:6px 12px; border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer; text-decoration:none; display:flex; align-items:center; gap:4px; transition:0.2s;}
         .btn-nfe:hover { background:var(--brand-orange); color:white;}
@@ -163,55 +165,34 @@
         @media (max-width: 768px) {
             .btn-hamburger { display: block; }
             .btn-open-sidebar { display: none !important; }
-            
             .sidebar { position: fixed; left: -320px; top: 0; bottom: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.5); z-index: 35; width: 280px; }
             .sidebar.mobile-open { left: 0; }
             .sidebar.collapsed { width: 280px; opacity: 1; }
-            .toggle-btn { display: none; }
-            .toggle-btn-mobile { display: flex; background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #fff; width: 30px; height: 30px; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; }
-            
-            .top-header { padding: 12px; flex-direction: column; align-items: flex-start; gap: 15px; }
-            .header-left { width: 100%; justify-content: space-between; }
-            .header-right { width: 100%; justify-content: space-between; overflow-x: auto; padding-bottom: 5px; }
-            .header-right::-webkit-scrollbar { display: none; }
-            
-            .dashboard { padding: 15px; }
-            
-            .nav-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; justify-content: flex-start; }
-            .nav-tabs::-webkit-scrollbar { height: 4px; }
-            .nav-tabs::-webkit-scrollbar-thumb { background-color: var(--brand-orange); border-radius: 4px; }
-            .nav-tab { white-space: nowrap; flex-shrink: 0; }
-            
-            .charts-grid { grid-template-columns: 1fr !important; gap: 15px;}
-            .kpi-grid { grid-template-columns: 1fr; gap: 15px;}
-            
+            .nav-tabs { flex-wrap: nowrap; overflow-x: auto; }
+            .charts-grid, .kpi-grid { grid-template-columns: 1fr !important; }
             .toolbar-int { flex-direction: column; align-items: stretch; }
             .toolbar-int > div { flex-direction: column; width: 100%; }
             .toolbar-int input { min-width: 100%; width: 100%; }
             .btn-sync-api, .btn-sync, .btn-export { width: 100%; margin-top: 10px; justify-content: center;}
-            
             table { font-size: 11px; }
             th, td { white-space: nowrap; padding: 10px 8px; }
-            .table-wrap { padding: 10px; }
-            
             .map-container { height: 450px; }
             .map-floating-left { width: calc(100% - 30px); top: auto; bottom: 15px; left: 15px; right: 15px; max-height: 200px; overflow-y: auto; }
-            
-            .auth-card { padding: 25px 20px; width: 92%; }
-            .auth-logo-text { font-size: 28px; }
-            .animating-login .auth-logo-text { font-size: 38px; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Container do Sistema de Notificações Toast -->
+    <div id="toast-container"></div>
+
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
+    <!-- Modais (Login, Admin, Settings) -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-card" id="loginCard">
             <div class="auth-logo-text" id="logoText">Cavalheiro<span style="color:var(--brand-orange)">log</span></div>
             <div class="auth-subtitle">ACESSO SEGURO</div>
-            <div class="auth-alert" id="authAlert"></div>
             <form id="loginForm" onsubmit="event.preventDefault(); executarLogin();" style="display:flex; flex-direction:column; gap:16px;">
                 <div class="auth-field"><label>Usuário</label><input type="text" id="loginUser" required></div>
                 <div class="auth-field"><label>Senha</label><input type="password" id="loginPass" required></div>
@@ -224,9 +205,8 @@
         <div class="auth-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 style="color:var(--brand-blue); font-weight:800;">👑 Novo Usuário</h3>
-                <button onclick="document.getElementById('adminModal').style.display='none'" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted);">✕</button>
+                <button onclick="document.getElementById('adminModal').style.display='none'" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
             </div>
-            <div class="auth-alert" id="adminAlert"></div>
             <form onsubmit="event.preventDefault(); cadastrarUsuario();" style="display:flex; flex-direction:column; gap:12px;">
                 <div class="auth-field"><label>Usuário</label><input type="text" id="regUser" required></div>
                 <div class="auth-field"><label>Senha</label><input type="password" id="regPass" required></div>
@@ -250,49 +230,35 @@
         <div class="auth-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 style="color:var(--brand-blue); font-weight:800;">⚙️ Configurações</h3>
-                <button onclick="document.getElementById('settingsModal').style.display='none'" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted);">✕</button>
+                <button onclick="document.getElementById('settingsModal').style.display='none'" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
             </div>
-            
-            <div class="auth-field">
-                <label>Cor Temática</label>
-                <input type="color" id="cfgColor1" value="#3b82f6" style="padding:0; height:40px; cursor:pointer; border:none;">
-            </div>
-            
+            <div class="auth-field"><label>Cor Temática</label><input type="color" id="cfgColor1" value="#3b82f6" style="padding:0; height:40px; cursor:pointer; border:none;"></div>
             <div class="auth-field" style="margin-top:10px;">
-                <label>Formato do "Top 10"</label>
-                <select id="cfgChartType">
-                    <option value="bar">Gráfico de Barras</option>
-                    <option value="line">Gráfico de Linhas</option>
-                    <option value="pie">Gráfico de Pizza</option>
-                </select>
+                <label>Formato Gráfico Top 10</label>
+                <select id="cfgChartType"><option value="bar">Barras</option><option value="line">Linhas</option><option value="pie">Pizza</option></select>
             </div>
-            
             <div class="auth-field" style="margin-top:10px;">
-                <label>Ocultar Blocos da Visão Geral</label>
+                <label>Ocultar Blocos</label>
                 <div class="perm-grid">
                     <label><input type="checkbox" id="v_topvol" checked> Top Volume</label>
                     <label><input type="checkbox" id="v_topeco" checked> Top Economia</label>
                     <label><input type="checkbox" id="v_classabc" checked> Gráfico ABC</label>
                 </div>
             </div>
-
             <hr style="border-color:var(--border-color); margin:10px 0;">
-            
             <div class="auth-field">
-                <label>Link do Servidor (Túnel Cloudflare)</label>
+                <label>URL do Backend (Túnel Cloudflare)</label>
                 <input type="text" id="cfgApiUrl" placeholder="Ex: https://novo-link.trycloudflare.com">
-                <small style="font-size:10px; color:var(--brand-orange); font-weight:bold;">Cole o link novo aqui caso o PC reinicie.</small>
             </div>
-
             <button onclick="salvarConfig()" class="auth-btn" style="margin-top:10px;">Salvar Configurações</button>
         </div>
     </div>
 
+    <!-- Barra Lateral de Filtros -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <span>FILTROS DA FROTA</span>
-            <button class="toggle-btn" onclick="toggleSidebar()" title="Recolher Menu">◀</button>
-            <button class="toggle-btn-mobile" onclick="toggleSidebar()">✕</button>
+            <button class="toggle-btn" onclick="toggleSidebar()">◀</button>
         </div>
         <div class="filter-section">
             <div class="field">
@@ -321,7 +287,7 @@
             </div>
 
             <div class="field" style="margin-top:12px;">
-                <label>⛽ Abastecimento</label>
+                <label>⛽ Tipo de Bomba</label>
                 <select id="filtroTipoAbast">
                     <option value="todos">Todos (Interno + Externo)</option>
                     <option value="Interno">Apenas Bomba Interna</option>
@@ -329,35 +295,36 @@
                 </select>
             </div>
 
-            <button class="btn-filter-main" id="btnConectar" style="margin-top:15px;">FILTRAR AGORA</button>
-            <div class="status-msg" id="statusMsg">Pronto para conectar</div>
+            <button class="btn-filter-main" id="btnConectar" style="margin-top:15px;">FILTRAR DADOS</button>
+            <div class="status-msg" id="statusMsg">Aguardando Conexão</div>
         </div>
     </div>
 
+    <!-- Área de Exibição Principal -->
     <div class="main-content">
         <header class="top-header">
             <div class="header-left">
                 <button class="btn-hamburger" onclick="toggleSidebar()">☰</button>
                 <button class="btn-open-sidebar" id="btnOpenSidebar" onclick="toggleSidebar()">▶ Filtros</button>
-                <div style="font-size:22px; font-weight:800; color:var(--brand-blue); letter-spacing: -0.5px;">Cavalheiro<span style="color:var(--brand-orange)">log</span></div>
+                <div style="font-size:22px; font-weight:800; color:var(--brand-blue);">Cavalheiro<span style="color:var(--brand-orange)">log</span></div>
             </div>
             <div class="header-right">
-                <span class="user-tag" id="loggedUserTag">👤 Usuário</span>
-                <button class="icon-action-btn" id="btnOpenSettings" title="Personalizar Layout e Conexão">⚙️ Layout</button>
-                <button class="icon-action-btn" id="btnOpenAdmin" title="Novo Usuário" style="display:none; background:var(--brand-orange); color:white; border:none;">➕ Novo</button>
-                <button class="theme-icon-btn" id="themeToggle" title="Modo Escuro">🌙</button>
-                <button class="icon-action-btn" id="logoutBtn" title="Sair do Sistema">🚪 Sair</button>
+                <span class="user-tag" id="loggedUserTag">👤 Convidado</span>
+                <button class="icon-action-btn" id="btnOpenSettings">⚙️ Layout</button>
+                <button class="icon-action-btn" id="btnOpenAdmin" style="display:none; background:var(--brand-orange); color:white;">➕ Novo</button>
+                <button class="theme-icon-btn" id="themeToggle">🌙</button>
+                <button class="icon-action-btn" id="logoutBtn">🚪 Sair</button>
             </div>
         </header>
 
         <div class="dashboard">
             <div class="nav-tabs" id="navTabs">
                 <button class="nav-tab" data-tab="tab-overview" id="btn_t_overview">📊 Visão Geral</button>
-                <button class="nav-tab" data-tab="tab-temporal" id="btn_t_temporal">📈 Evolução Analítica</button>
-                <button class="nav-tab" data-tab="tab-abc" id="btn_t_abc">📉 Curva ABC & Ranking</button>
+                <button class="nav-tab" data-tab="tab-temporal" id="btn_t_temporal">📈 Evolução</button>
+                <button class="nav-tab" data-tab="tab-abc" id="btn_t_abc">📉 Ranking ABC</button>
                 <button class="nav-tab" data-tab="tab-precos" id="btn_t_precos">💲 Preços Negociados</button>
-                <button class="nav-tab" data-tab="tab-heatmap" id="btn_t_heatmap">🔥 Mapa Híbrido</button>
-                <button class="nav-tab" data-tab="tab-integration" id="btn_t_integration">🔗 Integração NFe</button>
+                <button class="nav-tab" data-tab="tab-heatmap" id="btn_t_heatmap">🔥 Mapa</button>
+                <button class="nav-tab" data-tab="tab-integration" id="btn_t_integration">🔗 Auditoria NFe</button>
             </div>
 
             <div class="kpi-grid" id="kpiGrid"></div>
@@ -365,49 +332,37 @@
             <div id="tab-overview" class="tab-content">
                 <div class="charts-grid" style="grid-template-columns: 1fr;" id="box_topvol"><div class="chart-box"><h3>🏆 Top 10 Postos (Volume)</h3><div class="chart-container"><canvas id="cTopVol"></canvas></div></div></div>
                 <div class="charts-grid">
-                    <div class="chart-box" id="box_topeco"><h3>💰 Top 10 Postos (Economia Real)</h3><div class="chart-container"><canvas id="cTopEco"></canvas></div></div>
-                    <div class="chart-box" id="box_classabc"><h3>📊 Postos por Classe ABC</h3><div class="chart-container"><canvas id="cClassABC"></canvas></div></div>
+                    <div class="chart-box" id="box_topeco"><h3>💰 Top 10 (Economia Real)</h3><div class="chart-container"><canvas id="cTopEco"></canvas></div></div>
+                    <div class="chart-box" id="box_classabc"><h3>📊 Concentração ABC</h3><div class="chart-container"><canvas id="cClassABC"></canvas></div></div>
                 </div>
             </div>
             
             <div id="tab-temporal" class="tab-content">
                 <div class="charts-grid" style="grid-template-columns: 1fr;">
                     <div class="chart-box">
-                        <h3>📈 Cruzamento Diário (Volume x Preço Médio)</h3>
+                        <h3>📈 Cruzamento Diário (Volume x Preço Pago)</h3>
                         <div class="chart-container" style="min-height: 400px;"><canvas id="cEvoDual"></canvas></div>
                     </div>
                 </div>
             </div>
 
             <div id="tab-abc" class="tab-content">
-                <div class="charts-grid" style="grid-template-columns: 1fr;"><div class="chart-box"><h3>📊 Curva ABC Concentração</h3><div class="chart-container"><canvas id="cAbcBar"></canvas></div></div></div>
-                <div class="charts-grid" style="grid-template-columns: 1fr;"><div class="chart-box"><h3>📊 Volume por Classe</h3><div class="chart-container"><canvas id="cAbcPie"></canvas></div></div></div>
-                
+                <div class="charts-grid" style="grid-template-columns: 1fr;"><div class="chart-box"><h3>📊 Volume por Classe ABC</h3><div class="chart-container"><canvas id="cAbcBar"></canvas></div></div></div>
                 <div class="table-wrap">
-                    <h3>🏢 Ranking Detalhado da Frota</h3><br>
-                    <table><thead><tr><th>Rank</th><th>Posto</th><th>Cidade/UF</th><th class="text-right">Volume (L)</th><th class="text-right">Preço Médio Pago</th><th class="text-right">Custo Total</th><th class="text-right">Economia Real</th><th class="text-center">Classe ABC</th></tr></thead><tbody id="tbPostos"></tbody></table>
+                    <h3>🏢 Detalhamento Operacional da Frota</h3><br>
+                    <table><thead><tr><th>Rank</th><th>Posto</th><th>Cidade/UF</th><th class="text-right">Volume (L)</th><th class="text-right">Preço Médio</th><th class="text-right">Custo Total</th><th class="text-right">Econ. Real</th><th class="text-center">ABC</th></tr></thead><tbody id="tbPostos"></tbody></table>
                 </div>
             </div>
 
             <div id="tab-precos" class="tab-content">
                 <div class="table-wrap">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                        <div>
-                            <h3 style="display:inline-block;">💲 Análise de Divergência de Preços (Postos Negociados)</h3>
-                            <p style="font-size:12px; color:var(--text-muted); margin-top:5px; font-weight:600;">Compara o preço médio pago na bomba com o preço da tabela negociada registrado na TruckPag para aquele dia.</p>
-                        </div>
-                    </div>
+                    <h3>💲 Auditoria de Divergência de Preços</h3>
+                    <p style="font-size:12px; color:var(--text-muted); margin-bottom: 15px;">Compara o preço médio pago na bomba com a Tabela Negociada TruckPag no dia da nota.</p>
                     <table>
                         <thead>
                             <tr>
-                                <th>Rank</th>
-                                <th>Posto Homologado</th>
-                                <th class="text-right">Volume Analisado</th>
-                                <th class="text-right">Preço Negociado (Tabela)</th>
-                                <th class="text-right">Preço Médio Pago</th>
-                                <th class="text-right">Divergência (R$ / Litro)</th>
-                                <th class="text-right">Impacto Financeiro</th>
-                                <th class="text-center">Status de Auditoria</th>
+                                <th>Rank</th><th>Posto Homologado</th><th class="text-right">Vol. Analisado</th><th class="text-right">Preço Tabela</th>
+                                <th class="text-right">Preço Pago</th><th class="text-right">Divergência/L</th><th class="text-right">Impacto Acumulado</th><th class="text-center">Status</th>
                             </tr>
                         </thead>
                         <tbody id="tbPrecos"></tbody>
@@ -420,27 +375,13 @@
                     <div class="map-container">
                         <div id="heatmapMap" style="height:100%;width:100%;"></div>
                         <div class="map-floating-left">
-                            <span style="font-size:12px; font-weight:800; color:var(--brand-blue); text-transform:uppercase;">⚙️ Controles do Mapa</span><hr style="margin:8px 0; border-top:1px solid #ccc;">
-                            <input type="text" id="mapSearch" class="map-search" placeholder="Pesquisar cidade ou posto...">
-                            
-                            <label style="font-size:13px; cursor:pointer; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:6px;">
-                                <input type="checkbox" id="toggleHeatmapCheck" checked style="width:16px;height:16px;"> 🔥 Mancha de Calor
-                            </label>
-                            
-                            <div style="margin-top:15px; font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">📍 PINOS (ABC):</div>
-                            
-                            <div class="map-legenda">
-                                <label style="cursor:pointer; display:flex; align-items:center;"><input type="checkbox" id="checkClasseA" checked style="margin-right:8px; width:14px; height:14px;"> Classe A (80%)</label> 
-                                <span style="color:#10b981; font-size:18px;">●</span>
-                            </div>
-                            <div class="map-legenda">
-                                <label style="cursor:pointer; display:flex; align-items:center;"><input type="checkbox" id="checkClasseB" checked style="margin-right:8px; width:14px; height:14px;"> Classe B (15%)</label> 
-                                <span style="color:#f59e0b; font-size:18px;">●</span>
-                            </div>
-                            <div class="map-legenda">
-                                <label style="cursor:pointer; display:flex; align-items:center;"><input type="checkbox" id="checkClasseC" checked style="margin-right:8px; width:14px; height:14px;"> Classe C (5%)</label> 
-                                <span style="color:#ef4444; font-size:18px;">●</span>
-                            </div>
+                            <span style="font-size:12px; font-weight:800; color:var(--brand-blue);">⚙️ Controles do Mapa</span><hr style="margin:8px 0; border-top:1px solid #ccc;">
+                            <input type="text" id="mapSearch" class="map-search" placeholder="Pesquisar cidade...">
+                            <label style="font-size:13px; font-weight:700; display:flex; align-items:center; gap:6px; cursor:pointer;"><input type="checkbox" id="toggleHeatmapCheck" checked style="width:16px;height:16px;"> 🔥 Mancha de Calor</label>
+                            <div style="margin-top:15px; font-size:11px; font-weight:800; color:var(--text-muted);">📍 PINOS (ABC):</div>
+                            <div class="map-legenda"><label style="cursor:pointer;"><input type="checkbox" id="checkClasseA" checked> Classe A</label> <span style="color:#10b981; font-size:18px;">●</span></div>
+                            <div class="map-legenda"><label style="cursor:pointer;"><input type="checkbox" id="checkClasseB" checked> Classe B</label> <span style="color:#f59e0b; font-size:18px;">●</span></div>
+                            <div class="map-legenda"><label style="cursor:pointer;"><input type="checkbox" id="checkClasseC" checked> Classe C</label> <span style="color:#ef4444; font-size:18px;">●</span></div>
                         </div>
                     </div>
                 </div>
@@ -449,26 +390,19 @@
             <div id="tab-integration" class="tab-content">
                 <div class="table-wrap">
                     <div class="toolbar-int">
-                        <div style="display:flex; gap:10px; flex:1;">
-                            <input type="text" id="intSearchInput" placeholder="🔍 Buscar por Data, Posto, Placa, NFe ou CNPJ...">
-                        </div>
+                        <div style="display:flex; flex:1;"><input type="text" id="intSearchInput" placeholder="🔍 Buscar NFe, Posto ou Placa..."></div>
                         <div style="display:flex; gap:10px;">
-                            <button class="btn-sync" id="btnRecarregarTela" title="Atualiza a tela com os dados do banco local">🔄 Local</button>
-                            <button class="btn-sync-api" id="btnSyncApi" title="O Radar roda a cada 3 min, mas você pode forçar agora">⬇️ Nuvem</button>
-                            <button class="btn-export" id="btnExportCSV" title="Exporta os dados filtrados em CSV para o Excel">📥 Exportar CSV</button>
+                            <button class="btn-sync" id="btnRecarregarTela">🔄 Atualizar Tela</button>
+                            <button class="btn-sync-api" id="btnSyncApi">⬇️ Sincronizar Nuvem</button>
+                            <button class="btn-export" id="btnExportCSV">📥 Exportar CSV</button>
                         </div>
                     </div>
                     <table>
                         <thead>
                             <tr>
-                                <th>Data</th>
-                                <th>Transação</th>
-                                <th>Posto / Local <br><small style="color:var(--text-muted); text-transform:none; font-weight:600;">CNPJ Cadastrado</small></th>
-                                <th class="text-center">Placa</th>
-                                <th>Motorista</th>
-                                <th class="text-right">Volume / Tipo</th>
-                                <th class="text-right">Valor R$</th>
-                                <th>Status NFe <br><small style="color:var(--text-muted); text-transform:none; font-weight:600;">Validação & Documentos</small></th>
+                                <th>Data</th><th>Transação</th><th>Posto / CNPJ</th><th class="text-center">Placa</th>
+                                <th>Motorista</th><th class="text-right">Volume / Comb.</th><th class="text-right">Custo / Litro</th>
+                                <th>Status Fiscal</th>
                             </tr>
                         </thead>
                         <tbody id="tbInt"></tbody>
@@ -478,42 +412,28 @@
         </div>
     </div>
 
+    <!-- =========================================
+         LÓGICA JAVASCRIPT DO SISTEMA
+    ========================================= -->
     <script>
-        const URL_TUNEL = 'https://nodes-overview-physically-tahoe.trycloudflare.com'; 
-        let apiUrlAtual = localStorage.getItem('cavalheiro_api_url') || URL_TUNEL;
+        // --- 1. UTILITÁRIOS GERAIS ---
+        
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = type === 'success' ? `✅ ${message}` : `❌ ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'fadeOut 0.3s forwards'; setTimeout(() => toast.remove(), 300); }, 3500);
+        }
 
+        const URL_TUNEL = 'http://localhost:3000'; 
+        let apiUrlAtual = localStorage.getItem('cavalheiro_api_url') || URL_TUNEL;
         let cfgColor = localStorage.getItem('cfg_color') || '#3b82f6';
         let cfgChartType = localStorage.getItem('cfg_chart') || 'bar';
         document.documentElement.style.setProperty('--chart-color-1', cfgColor);
 
-        window.salvarConfig = function() {
-            cfgColor = document.getElementById('cfgColor1').value;
-            cfgChartType = document.getElementById('cfgChartType').value;
-            localStorage.setItem('cfg_color', cfgColor); localStorage.setItem('cfg_chart', cfgChartType);
-            document.documentElement.style.setProperty('--chart-color-1', cfgColor);
-
-            const vTop = document.getElementById('v_topvol').checked;
-            const vEco = document.getElementById('v_topeco').checked;
-            const vAbc = document.getElementById('v_classabc').checked;
-            localStorage.setItem('v_topvol', vTop); localStorage.setItem('v_topeco', vEco); localStorage.setItem('v_classabc', vAbc);
-            
-            document.getElementById('box_topvol').style.display = vTop ? 'grid' : 'none';
-            document.getElementById('box_topeco').style.display = vEco ? 'flex' : 'none';
-            document.getElementById('box_classabc').style.display = vAbc ? 'flex' : 'none';
-
-            const novaApiUrl = document.getElementById('cfgApiUrl').value.trim().replace(/\/$/, "");
-            if(novaApiUrl) {
-                apiUrlAtual = novaApiUrl;
-                localStorage.setItem('cavalheiro_api_url', apiUrlAtual);
-            }
-
-            document.getElementById('settingsModal').style.display = 'none';
-            if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-overview') renderTabContent();
-            
-            document.getElementById('statusMsg').innerHTML = 'Configurações atualizadas!';
-            document.getElementById('statusMsg').className = 'status-msg success';
-        };
-
+        // --- 2. GESTÃO DE ACESSOS E LOGIN ---
         const MASTER_ADMIN = 'pedro.cavalheirolog';
         async function hashPassword(senha) {
             const encoder = new TextEncoder();
@@ -528,12 +448,8 @@
                 users[MASTER_ADMIN] = { hash: await hashPassword('Log2026@'), isAdmin: true, perms: { overview: true, temporal: true, abc: true, precos: true, heatmap: true, integration: true } };
                 localStorage.setItem('cavalheiro_users', JSON.stringify(users));
             }
-            
             document.getElementById('cfgColor1').value = cfgColor;
             document.getElementById('cfgChartType').value = cfgChartType;
-            document.getElementById('box_topvol').style.display = localStorage.getItem('v_topvol') !== 'false' ? 'grid' : 'none';
-            document.getElementById('box_topeco').style.display = localStorage.getItem('v_topeco') !== 'false' ? 'flex' : 'none';
-            document.getElementById('box_classabc').style.display = localStorage.getItem('v_classabc') !== 'false' ? 'flex' : 'none';
         }
 
         window.executarLogin = async function() {
@@ -550,13 +466,9 @@
                 if(uPerms.stations !== undefined && uPerms.precos === undefined) { uPerms.precos = uPerms.stations; }
                 sessionStorage.setItem('user_perms', JSON.stringify(uPerms));
                 
-                setTimeout(() => {
-                    loginOverlay.style.opacity = '0';
-                    setTimeout(() => window.location.reload(), 1500);
-                }, 1000);
+                setTimeout(() => { window.location.reload(); }, 1500);
             } else {
-                const alt = document.getElementById('authAlert');
-                alt.textContent = 'Usuário ou senha incorretos.'; alt.className = 'auth-alert error';
+                showToast('Usuário ou Senha incorretos.', 'error');
             }
         };
 
@@ -564,7 +476,9 @@
             const newUser = document.getElementById('regUser').value.trim().toLowerCase();
             const newPass = document.getElementById('regPass').value;
             let users = JSON.parse(localStorage.getItem('cavalheiro_users') || '{}');
-            if (users[newUser]) return alert('Usuário já existe!');
+            if (users[newUser]) {
+                showToast('Usuário já existe!', 'error'); return;
+            }
             users[newUser] = {
                 hash: await hashPassword(newPass), isAdmin: false,
                 perms: {
@@ -575,18 +489,40 @@
             };
             localStorage.setItem('cavalheiro_users', JSON.stringify(users));
             document.getElementById('adminModal').style.display = 'none';
-            alert(`Usuário ${newUser} criado com sucesso!`);
+            showToast(`Usuário ${newUser} criado com sucesso!`, 'success');
         };
 
         document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.clear(); window.location.reload(); });
 
+        // --- 3. MANIPULAÇÃO DE INTERFACE E FILTROS ---
+        window.salvarConfig = function() {
+            cfgColor = document.getElementById('cfgColor1').value;
+            cfgChartType = document.getElementById('cfgChartType').value;
+            localStorage.setItem('cfg_color', cfgColor); localStorage.setItem('cfg_chart', cfgChartType);
+            document.documentElement.style.setProperty('--chart-color-1', cfgColor);
+
+            const vTop = document.getElementById('v_topvol').checked;
+            const vEco = document.getElementById('v_topeco').checked;
+            const vAbc = document.getElementById('v_classabc').checked;
+            localStorage.setItem('v_topvol', vTop); localStorage.setItem('v_topeco', vEco); localStorage.setItem('v_classabc', vAbc);
+            
+            document.getElementById('box_topvol').style.display = vTop ? 'grid' : 'none';
+            document.getElementById('box_topeco').style.display = vEco ? 'flex' : 'none';
+            document.getElementById('box_classabc').style.display = vAbc ? 'flex' : 'none';
+
+            const novaApiUrl = document.getElementById('cfgApiUrl').value.trim().replace(/\/$/, "");
+            if(novaApiUrl) { apiUrlAtual = novaApiUrl; localStorage.setItem('cavalheiro_api_url', apiUrlAtual); }
+
+            document.getElementById('settingsModal').style.display = 'none';
+            showToast('Layout atualizado com sucesso!', 'success');
+            if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-overview') renderTabContent();
+        };
+
         window.toggleSidebar = function() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('mobileOverlay');
-            
             if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('mobile-open');
-                overlay.classList.toggle('active');
+                sidebar.classList.toggle('mobile-open'); overlay.classList.toggle('active');
             } else {
                 const btnOpen = document.getElementById('btnOpenSidebar');
                 sidebar.classList.toggle('collapsed');
@@ -626,18 +562,18 @@
         }
 
         window.baixarNFePdf = function(chave) {
-            if(!chave) return alert('Chave NFe não disponível.');
+            if(!chave) { showToast('Chave NFe não disponível.', 'error'); return; }
             navigator.clipboard.writeText(chave).then(() => {
-                alert('✅ CHAVE DA NOTA COPIADA COM SUCESSO!\n\nO portal será aberto agora. Basta clicar na barra de pesquisa, apertar "Colar" (ou Ctrl+V) e você poderá visualizar e baixar o PDF.');
-                window.open('https://www.fsist.com.br/', '_blank');
+                showToast('Chave copiada! Pressione "Colar" no portal FSist.', 'success');
+                setTimeout(() => window.open('https://www.fsist.com.br/', '_blank'), 1500);
             }).catch(err => {
-                prompt('Seu navegador bloqueou a cópia automática. Copie a chave abaixo e cole no portal que será aberto:', chave);
+                prompt('Seu navegador bloqueou a cópia automática. Copie a chave abaixo:', chave);
                 window.open('https://www.fsist.com.br/', '_blank');
             });
         };
 
         window.exportarCSV = function() {
-            if (!transacoesFiltradas || transacoesFiltradas.length === 0) return alert("Nenhum dado na tela para exportar.");
+            if (!transacoesFiltradas || transacoesFiltradas.length === 0) { showToast("Nenhum dado para exportar.", "error"); return; }
             let csv = "Data;Transacao;Posto;Cidade;UF;Tipo Abastecimento;Placa;Motorista;Volume(L);Valor Total(R$);Valor Litro(R$);Preco Tabela(R$);Status NFe;Chave NFe;CNPJ Posto;CNPJ Cliente;Combustivel\n";
             transacoesFiltradas.forEach(t => {
                 const dtStr = t.data ? t.data.split(' ')[0].split('-').reverse().join('/') : 'ND';
@@ -653,10 +589,11 @@
             link.setAttribute("href", URL.createObjectURL(blob));
             link.setAttribute("download", `auditoria_cavalheirolog_${dts.dtIni}_ate_${dts.dtFim}.csv`);
             document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            showToast('Arquivo exportado com sucesso!', 'success');
         };
 
-        let transacoesGlobais = [], transacoesFiltradas = []; 
-        let todosPostos = [];
+        // --- 4. MOTOR DE ANÁLISE DE DADOS (FRONTEND) ---
+        let transacoesGlobais = [], transacoesFiltradas = [], todosPostos = [];
         let mapInstance = null, heatLayer = null, markersLayer = null;
 
         const coordsBrasil = {
@@ -680,37 +617,28 @@
         const coordsEstados = { 'MT':{lat:-12.6,lng:-55.4}, 'PR':{lat:-24.8,lng:-51.5}, 'SP':{lat:-23.5,lng:-46.6}, 'RO':{lat:-10.9,lng:-62.8}, 'MS':{lat:-20.5,lng:-54.5}, 'GO':{lat:-15.9,lng:-49.8}, 'MG':{lat:-18.5,lng:-44.4}, 'BA':{lat:-12.9,lng:-41.6} };
 
         function limparNomePosto(nome) {
-            if(!nome) return 'ND';
-            return nome.replace(/POSTO EXTERNO - |BOMBA INTERNA - /ig, '').substring(0, 25);
+            if(!nome) return 'ND'; return nome.replace(/POSTO EXTERNO - |BOMBA INTERNA - /ig, '').substring(0, 25);
         }
 
         function processarDados() {
-            // INTELIGÊNCIA DE AUTO-CORREÇÃO (Resolve o bug do "Apenas Postos Externos" não funcionar)
-            // Se o banco não salvou corretamente se o posto é interno ou externo, ele deduz pelo nome!
+            // Inteligência Auto-Correct: Deduz interno/externo pelo nome se a API falhar em trazer o dado
             transacoesGlobais.forEach(t => {
                 let estabDB = (t.estabelecimento || '').toUpperCase();
                 let tipoDB = (t.tipoAbastecimento || '').toUpperCase();
-                
                 if (!tipoDB.includes('INTERNO') && !tipoDB.includes('EXTERNO')) {
                     t.tipoAbastecimento = estabDB.includes('INTERNA') ? 'Interno' : 'Externo';
                 }
             });
 
             const tipoAbast = document.getElementById('filtroTipoAbast').value;
-            
-            // FILTRAGEM ULTRA-SEGURA
             transacoesFiltradas = transacoesGlobais.filter(t => {
                 if (tipoAbast === 'todos') return true;
-                const tipoAtual = (t.tipoAbastecimento || '').toUpperCase();
-                
-                if (tipoAbast === 'Interno') return tipoAtual.includes('INTERNO');
-                if (tipoAbast === 'Externo') return tipoAtual.includes('EXTERNO');
-                return true;
+                return (t.tipoAbastecimento || '').toUpperCase().includes(tipoAbast.toUpperCase());
             });
 
             const statusBox = document.getElementById('statusMsg');
             if (statusBox.className.includes('success') && transacoesGlobais.length > 0) {
-                statusBox.innerHTML = `✅ ${transacoesFiltradas.length} Listados (Banco Local)`;
+                statusBox.innerHTML = `✅ ${transacoesFiltradas.length} Listados (Local)`;
             }
 
             const map = new Map();
@@ -725,10 +653,9 @@
                 const val = parseFloat(t.valor_total) || 0;
                 const precoTab = parseFloat(t.preco_tabela) || 0;
 
-                p.volume += vol; 
-                p.custo += val; 
+                p.volume += vol; p.custo += val; 
 
-                // ECONOMIA COM BASE NA TABELA NEGOCIADA
+                // Motor Financeiro de Tabela Negociada
                 if (precoTab > 0) {
                     p.custoTabela += (vol * precoTab);
                     p.volComTabela += vol;
@@ -738,9 +665,7 @@
                 }
 
                 volT += vol; cusT += val;
-
-                const comb = (t.combustivel || '').toUpperCase();
-                if (comb.includes('ARLA')) volArla += vol; else volDiesel += vol;
+                if ((t.combustivel || '').toUpperCase().includes('ARLA')) volArla += vol; else volDiesel += vol;
             });
 
             todosPostos = Array.from(map.values()).sort((a, b) => b.volume - a.volume);
@@ -755,19 +680,20 @@
             });
 
             document.getElementById('kpiGrid').innerHTML = `
-                <div class="kpi-card"><div class="label">Total de Postos</div><div class="value">${todosPostos.length}</div></div>
+                <div class="kpi-card"><div class="label">Postos Utilizados</div><div class="value">${todosPostos.length}</div></div>
                 <div class="kpi-card">
-                    <div class="label">Volume Abastecido</div><div class="value">${fmt(volT)} L</div>
+                    <div class="label">Volume Global</div><div class="value">${fmt(volT)} L</div>
                     <div class="split-info"><span style="color:var(--brand-blue)">⛽ Diesel: ${fmt(volDiesel)} L</span> | <span style="color:#0ea5e9">💧 Arla: ${fmt(volArla)} L</span></div>
                 </div>
-                <div class="kpi-card"><div class="label">Custo Total Pago</div><div class="value">R$ ${fmt(cusT)}</div></div>
+                <div class="kpi-card"><div class="label">Faturamento Liquidado</div><div class="value">R$ ${fmt(cusT)}</div></div>
                 <div class="kpi-card highlight tooltip-container">
-                    <div class="label">Economia Real ℹ️</div><div class="value">R$ ${fmt(ecoT)}</div>
-                    <div class="tooltip-box"><b>Cálculo Financeiro Exato:</b><br>Soma da litragem multiplicada pela diferença entre o <b>Preço Negociado</b> (cadastrado no histórico da TruckPag) e o Preço Médio pago na bomba no dia da nota.<br><br><i>Notas sem preço de tabela registrado não entram neste cálculo.</i></div>
+                    <div class="label">Economia Base Tabela ℹ️</div><div class="value">R$ ${fmt(ecoT)}</div>
+                    <div class="tooltip-box"><b>Cálculo Financeiro Exato:</b><br>Soma da litragem multiplicada pela diferença entre o <b>Preço Negociado</b> (histórico TruckPag) e o Preço Médio pago na bomba.<br><br><i>Notas sem preço de tabela não entram neste cálculo.</i></div>
                 </div>
             `;
         }
 
+        // --- 6. RENDERIZAÇÃO DAS ABAS (GRÁFICOS, TABELAS E MAPAS) ---
         function renderTabContent() {
             if(todosPostos.length === 0) return;
             const activeTab = document.querySelector('.nav-tab.active')?.dataset.tab;
@@ -821,7 +747,6 @@
             if(activeTab === 'tab-abc') {
                 Chart.getChart('cAbcBar')?.destroy(); Chart.getChart('cAbcPie')?.destroy();
                 new Chart(document.getElementById('cAbcBar'), { type: 'bar', data: { labels: todosPostos.slice(0,30).map((_,i)=>i+1), datasets: [{ label: 'Vol.', data: todosPostos.slice(0,30).map(p=>p.volume), backgroundColor: todosPostos.slice(0,30).map(p=>p.abc==='A'?'#10b981':(p.abc==='B'?'#f59e0b':'#ef4444')) }] }, options: { maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip: tooltipAbc } } });
-                new Chart(document.getElementById('cAbcPie'), { type: 'doughnut', data: { labels: ['A (80%)', 'B (15%)', 'C (5%)'], datasets: [{ data: [todosPostos.filter(p=>p.abc==='A').reduce((a,b)=>a+b.volume,0), todosPostos.filter(p=>p.abc==='B').reduce((a,b)=>a+b.volume,0), todosPostos.filter(p=>p.abc==='C').reduce((a,b)=>a+b.volume,0)], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'] }] }, options:{maintainAspectRatio:false}});
                 
                 const tb = document.getElementById('tbPostos'); tb.innerHTML = '';
                 todosPostos.forEach((p, i) => { 
@@ -871,7 +796,6 @@
                 
                 const pts = []; markersLayer = L.layerGroup();
                 const termoBusca = document.getElementById('mapSearch').value.toUpperCase();
-                
                 const showA = document.getElementById('checkClasseA').checked;
                 const showB = document.getElementById('checkClasseB').checked;
                 const showC = document.getElementById('checkClasseC').checked;
@@ -908,70 +832,59 @@
             }
 
             if(activeTab === 'tab-integration') {
-                renderIntegrationTable();
+                const tb = document.getElementById('tbInt'); tb.innerHTML = '';
+                const termo = document.getElementById('intSearchInput').value.toLowerCase();
+                
+                transacoesFiltradas.forEach(t => {
+                    const dtStr = t.data ? t.data.split(' ')[0].split('-').reverse().join('/') : 'ND';
+                    const combTxt = t.combustivel || 'ND';
+                    const rowText = `${dtStr} ${t.id} ${t.estabelecimento} ${t.cidade} ${t.uf} ${t.placa} ${t.motorista} ${t.status_nfe} ${t.cnpj_posto} ${t.chave_nfe} ${t.cnpj_cliente} ${combTxt}`.toLowerCase();
+                    
+                    if (termo && !rowText.includes(termo)) return;
+
+                    const cnpjEsperado = getCNPJEstruturado(t.uf, t.cidade, t.estabelecimento);
+                    const cnpjRecebido = formatarCNPJ(t.cnpj_cliente || '');
+                    const hasNfe = t.status_nfe === 'Vinculada';
+                    let cnpjStatus = '<span class="badge warning" style="color:var(--warning); font-weight:normal">Aguardando NFe</span>';
+                    
+                    if (hasNfe) {
+                        if (cnpjRecebido === cnpjEsperado) {
+                            cnpjStatus = `<span class="badge green">✅ CNPJ OK (${cnpjEsperado})</span>`;
+                        } else {
+                            cnpjStatus = `<span class="badge red" style="display:inline-block; margin-top:4px;">❌ ERRO. EMITIDO: ${cnpjRecebido||'ND'}<br>ESPERADO: ${cnpjEsperado}</span>`;
+                        }
+                    }
+
+                    const btnPdf = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}')">📄 Visualizar / Baixar PDF</a></div>` : '';
+
+                    tb.innerHTML += `<tr>
+                        <td>${dtStr}</td>
+                        <td><b>${t.id}</b></td>
+                        <td>${t.estabelecimento}<br><small style="color:var(--text-muted)">CNPJ: ${formatarCNPJ(t.cnpj_posto)||'ND'}</small></td>
+                        <td class="text-center"><span class="badge" style="background:#e2e8f0; color:#475569;">${t.placa||'ND'}</span></td>
+                        <td><small style="font-weight:700;">${t.motorista||'ND'}</small></td>
+                        <td class="text-right"><b>${fmt(t.volume)} L</b><br><small style="color:var(--brand-blue)">${combTxt}</small></td>
+                        <td class="text-right"><b>R$ ${fmt(t.valor_total)}</b><br><small>R$ ${fmt(t.valor_litro)}/L</small></td>
+                        <td><div class="status-box"><b><span style="color:${hasNfe?'var(--success)':'var(--danger)'}">${hasNfe?'✅ Vinculada':'⚠️ Pendente'}</span></b>${hasNfe ? `<small style="color:var(--text-muted)">${t.chave_nfe||''}</small>` : ''}<div>${cnpjStatus}</div>${btnPdf}</div></td>
+                    </tr>`;
+                });
             }
         }
-
-        function renderIntegrationTable() {
-            const tb = document.getElementById('tbInt'); tb.innerHTML = '';
-            const termo = document.getElementById('intSearchInput').value.toLowerCase();
-            
-            transacoesFiltradas.forEach(t => {
-                const dtStr = t.data ? t.data.split(' ')[0].split('-').reverse().join('/') : 'ND';
-                const combTxt = t.combustivel || 'ND';
-                const rowText = `${dtStr} ${t.id} ${t.estabelecimento} ${t.cidade} ${t.uf} ${t.placa} ${t.motorista} ${t.status_nfe} ${t.cnpj_posto} ${t.chave_nfe} ${t.cnpj_cliente} ${combTxt}`.toLowerCase();
-                
-                if (termo && !rowText.includes(termo)) return;
-
-                const cnpjEsperado = getCNPJEstruturado(t.uf, t.cidade, t.estabelecimento);
-                const cnpjRecebido = formatarCNPJ(t.cnpj_cliente || '');
-                const hasNfe = t.status_nfe === 'Vinculada';
-                let cnpjStatus = '<span class="badge warning" style="color:var(--warning); font-weight:normal">Aguardando NFe</span>';
-                
-                if (hasNfe) {
-                    if (cnpjRecebido === cnpjEsperado) {
-                        cnpjStatus = `<span class="badge green">✅ CNPJ OK (${cnpjEsperado})</span>`;
-                    } else {
-                        cnpjStatus = `<span class="badge red" style="display:inline-block; margin-top:4px;">❌ ERRO. EMITIDO: ${cnpjRecebido||'ND'}<br>ESPERADO: ${cnpjEsperado}</span>`;
-                    }
-                }
-
-                const btnPdf = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}')">📄 Visualizar / Baixar PDF</a></div>` : '';
-
-                tb.innerHTML += `<tr>
-                    <td>${dtStr}</td>
-                    <td><b>${t.id}</b></td>
-                    <td>${t.estabelecimento}<br><small style="color:var(--text-muted)">CNPJ: ${formatarCNPJ(t.cnpj_posto)||'ND'}</small></td>
-                    <td class="text-center"><span class="badge" style="background:#e2e8f0; color:#475569;">${t.placa||'ND'}</span></td>
-                    <td><small style="font-weight:700;">${t.motorista||'ND'}</small></td>
-                    <td class="text-right"><b>${fmt(t.volume)} L</b><br><small style="color:var(--brand-blue)">${combTxt}</small></td>
-                    <td class="text-right"><b>R$ ${fmt(t.valor_total)}</b><br><small>R$ ${fmt(t.valor_litro)}/L</small></td>
-                    <td>
-                        <div class="status-box">
-                            <b><span style="color:${hasNfe?'var(--success)':'var(--danger)'}">${hasNfe?'✅ Vinculada':'⚠️ Pendente'}</span></b>
-                            ${hasNfe ? `<small style="color:var(--text-muted)">${t.chave_nfe||''}</small>` : ''}
-                            <div>${cnpjStatus}</div>
-                            ${btnPdf}
-                        </div>
-                    </td>
-                </tr>`;
-            });
-        }
         
-        document.getElementById('intSearchInput').addEventListener('input', renderIntegrationTable);
-        
-        document.getElementById('mapSearch').addEventListener('input', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
-        document.getElementById('toggleHeatmapCheck').addEventListener('change', (e) => { if (!mapInstance || !heatLayer) return; if (e.target.checked) mapInstance.addLayer(heatLayer); else mapInstance.removeLayer(heatLayer); });
-        document.getElementById('checkClasseA').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
-        document.getElementById('checkClasseB').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
-        document.getElementById('checkClasseC').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
-
+        // --- 7. EVENT LISTENERS E INTEGRAÇÃO DE API ---
         document.getElementById('navTabs').addEventListener('click', e => {
             const b = e.target.closest('.nav-tab'); if(!b) return;
             document.querySelectorAll('.nav-tab, .tab-content').forEach(el => el.classList.remove('active'));
             b.classList.add('active'); document.getElementById(b.dataset.tab).classList.add('active');
             setTimeout(renderTabContent, 50); 
         });
+
+        document.getElementById('intSearchInput').addEventListener('input', renderTabContent);
+        document.getElementById('mapSearch').addEventListener('input', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('toggleHeatmapCheck').addEventListener('change', (e) => { if (!mapInstance || !heatLayer) return; if (e.target.checked) mapInstance.addLayer(heatLayer); else mapInstance.removeLayer(heatLayer); });
+        document.getElementById('checkClasseA').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseB').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseC').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
 
         async function fetchAPILocal() {
             const status = document.getElementById('statusMsg');
@@ -985,35 +898,32 @@
                 transacoesGlobais = res.transacoes || [];
                 
                 if(transacoesGlobais.length === 0) {
-                    status.innerHTML = '⚠️ Nenhum dado no período (Banco Vazio)'; status.className = 'status-msg warning'; document.getElementById('kpiGrid').innerHTML = '';
+                    status.innerHTML = '⚠️ Banco Vazio no Período'; status.className = 'status-msg warning'; document.getElementById('kpiGrid').innerHTML = '';
+                    showToast('Não foram encontradas notas fiscais neste intervalo de datas.', 'warning');
                 } else {
-                    processarDados(); renderTabContent(); 
+                    processarDados(); 
+                    if(document.querySelector('.nav-tab.active')) renderTabContent(); 
+                    showToast('Dados consolidados com sucesso.', 'success');
                 }
             } catch (e) {
-                status.innerHTML = `❌ Falha no Servidor. Verifique o CMD e o Link no Layout.`; status.className = 'status-msg error';
+                status.innerHTML = `❌ Servidor Inativo.`; status.className = 'status-msg error';
+                showToast('Falha ao conectar no Backend (Túnel Cloudflare Offline).', 'error');
             }
         }
 
         async function acionarRoboTruckPag() {
-            const btn = document.getElementById('btnSyncApi');
             const dates = getDatasFiltro();
             const BASE_API = apiUrlAtual || 'http://localhost:3000';
-
-            btn.innerHTML = '⏳ Servidor Sincronizando...';
-            btn.style.background = '#f59e0b';
             
             try {
+                showToast('Enviando comando para o servidor...', 'success');
                 const response = await fetch(`${BASE_API}/api/forcar-sync-background`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dates)
                 });
                 const res = await response.json();
-                alert('🚀 ' + res.message);
-                
-                setTimeout(() => { btn.innerHTML = '⬇️ Nuvem'; btn.style.background = 'var(--brand-blue)'; }, 3000);
-
+                showToast(res.message, 'success');
             } catch(e) {
-                alert('❌ Erro de conexão ao tentar acionar a TruckPag.');
-                btn.innerHTML = '⬇️ Nuvem'; btn.style.background = 'var(--brand-blue)';
+                showToast('O Servidor falhou em acionar a TruckPag.', 'error');
             }
         }
 
@@ -1021,7 +931,6 @@
         document.getElementById('btnRecarregarTela').addEventListener('click', fetchAPILocal);
         document.getElementById('btnSyncApi').addEventListener('click', acionarRoboTruckPag);
         document.getElementById('btnExportCSV').addEventListener('click', exportarCSV);
-        
         document.getElementById('filtroTipoAbast').addEventListener('change', () => { if(transacoesGlobais.length>0){ processarDados(); renderTabContent(); } });
 
         window.onload = async () => {
@@ -1038,11 +947,6 @@
                 document.getElementById('btnOpenAdmin').addEventListener('click', () => document.getElementById('adminModal').style.display='flex');
                 
                 document.getElementById('btnOpenSettings').addEventListener('click', () => {
-                    document.getElementById('cfgColor1').value = cfgColor;
-                    document.getElementById('cfgChartType').value = cfgChartType;
-                    document.getElementById('v_topvol').checked = localStorage.getItem('v_topvol') !== 'false';
-                    document.getElementById('v_topeco').checked = localStorage.getItem('v_topeco') !== 'false';
-                    document.getElementById('v_classabc').checked = localStorage.getItem('v_classabc') !== 'false';
                     document.getElementById('cfgApiUrl').value = apiUrlAtual; 
                     document.getElementById('settingsModal').style.display = 'flex';
                 });
@@ -1064,7 +968,7 @@
         let isDark = false;
         document.getElementById('themeToggle').addEventListener('click', () => {
             isDark = !isDark; document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            renderTabContent();
+            if(document.querySelector('.nav-tab.active')) renderTabContent();
         });
     </script>
 </body>
