@@ -40,6 +40,7 @@
         .toast { background: var(--brand-blue); color: white; padding: 15px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; animation: slideInRight 0.3s ease forwards; max-width: 350px;}
         .toast.success { border-left: 5px solid var(--success); }
         .toast.error { border-left: 5px solid var(--danger); }
+        .toast.warning { border-left: 5px solid var(--warning); }
         @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         @keyframes fadeOut { to { opacity: 0; transform: translateY(-10px); } }
 
@@ -142,11 +143,8 @@
         .toolbar-int input { flex:1; min-width:300px; padding:12px 15px; border-radius:6px; border:1px solid var(--border-color); background:var(--surface-color); color:var(--text-main); outline:none; font-size:14px; font-weight:600;}
         
         .btn-sync { padding:10px 15px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; transition:0.2s;}
-        .btn-sync:hover { background:var(--border-color); transform: scale(1.05); }
         .btn-sync-api { padding:10px 15px; background:var(--brand-blue); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
-        .btn-sync-api:hover { background:var(--brand-orange); }
         .btn-export { padding:10px 15px; background:#10b981; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
-        .btn-export:hover { background:#059669; }
 
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; width:max-content; }
         .badge.green { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -155,9 +153,7 @@
 
         .nfe-links { display:flex; gap:8px; margin-top:5px; }
         .btn-nfe { background:var(--brand-blue); color:white; border:none; padding:6px 12px; border-radius:4px; font-size:11px; font-weight:bold; cursor:pointer; text-decoration:none; display:flex; align-items:center; gap:4px; transition:0.2s;}
-        .btn-nfe:hover { background:var(--brand-orange); color:white;}
         .btn-nfe.alt { background: var(--success); }
-        .btn-nfe.alt:hover { background: #059669; }
 
         .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 25; backdrop-filter: blur(2px); }
         .mobile-overlay.active { display: block; }
@@ -183,7 +179,7 @@
 </head>
 <body>
 
-    <!-- Container do Sistema de Notificações Toast -->
+    <!-- Container Toast Notifications -->
     <div id="toast-container"></div>
 
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
@@ -393,7 +389,7 @@
                         <div style="display:flex; flex:1;"><input type="text" id="intSearchInput" placeholder="🔍 Buscar NFe, Posto ou Placa..."></div>
                         <div style="display:flex; gap:10px;">
                             <button class="btn-sync" id="btnRecarregarTela">🔄 Atualizar Tela</button>
-                            <button class="btn-sync-api" id="btnSyncApi">⬇️ Sincronizar Nuvem</button>
+                            <button class="btn-sync-api" id="btnSyncApi">⬇️ Nuvem TruckPag</button>
                             <button class="btn-export" id="btnExportCSV">📥 Exportar CSV</button>
                         </div>
                     </div>
@@ -422,7 +418,7 @@
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
-            toast.innerHTML = type === 'success' ? `✅ ${message}` : `❌ ${message}`;
+            toast.innerHTML = type === 'success' ? `✅ ${message}` : (type === 'error' ? `❌ ${message}` : `⚠️ ${message}`);
             container.appendChild(toast);
             setTimeout(() => { toast.style.animation = 'fadeOut 0.3s forwards'; setTimeout(() => toast.remove(), 300); }, 3500);
         }
@@ -539,18 +535,39 @@
             document.getElementById('boxMensal').style.display = val === 'mensal' ? 'block' : 'none';
         };
 
+        // A CORREÇÃO DE DATAS INTELIGENTE AQUI
         function getDatasFiltro() {
             const tipo = document.getElementById('tipoPeriodoSelect').value;
-            if (tipo === 'diario') return { dtIni: document.getElementById('dataInicio').value, dtFim: document.getElementById('dataFim').value };
-            const ano = document.getElementById('selAno').value; const mes = document.getElementById('selMes').value;
-            const ultimoDia = new Date(ano, parseInt(mes), 0).getDate();
-            return { dtIni: `${ano}-${mes}-01`, dtFim: `${ano}-${mes}-${String(ultimoDia).padStart(2,'0')}` };
+            let dtIni, dtFim;
+
+            if (tipo === 'diario') {
+                dtIni = document.getElementById('dataInicio').value;
+                dtFim = document.getElementById('dataFim').value;
+                
+                // Auto-Swap se a data inicial for maior que a final
+                if (dtIni > dtFim) {
+                    const temp = dtIni;
+                    dtIni = dtFim;
+                    dtFim = temp;
+                    document.getElementById('dataInicio').value = dtIni;
+                    document.getElementById('dataFim').value = dtFim;
+                    showToast('Datas invertidas! O sistema corrigiu automaticamente.', 'warning');
+                }
+            } else {
+                const ano = document.getElementById('selAno').value; 
+                const mes = document.getElementById('selMes').value;
+                const ultimoDia = new Date(ano, parseInt(mes), 0).getDate();
+                dtIni = `${ano}-${mes}-01`; 
+                dtFim = `${ano}-${mes}-${String(ultimoDia).padStart(2,'0')}`;
+            }
+            return { dtIni, dtFim };
         }
 
         function formatarCNPJ(cnpj) {
             if(!cnpj) return ''; cnpj = cnpj.replace(/\D/g, ''); if(cnpj.length !== 14) return cnpj;
             return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
         }
+        
         function getCNPJEstruturado(uf, cidade, posto) {
             uf = (uf || '').toUpperCase(); cid = (cidade || '').toUpperCase(); p = (posto || '').toUpperCase();
             if (uf === 'PA' && p.includes('MIRIAM') && (cid.includes('ITAITUBA') || cid.includes('MIRITITUBA'))) return '07.689.042/0009-88';
@@ -621,7 +638,7 @@
         }
 
         function processarDados() {
-            // Inteligência Auto-Correct: Deduz interno/externo pelo nome se a API falhar em trazer o dado
+            // Inteligência Auto-Correct
             transacoesGlobais.forEach(t => {
                 let estabDB = (t.estabelecimento || '').toUpperCase();
                 let tipoDB = (t.tipoAbastecimento || '').toUpperCase();
@@ -655,7 +672,6 @@
 
                 p.volume += vol; p.custo += val; 
 
-                // Motor Financeiro de Tabela Negociada
                 if (precoTab > 0) {
                     p.custoTabela += (vol * precoTab);
                     p.volComTabela += vol;
@@ -688,12 +704,12 @@
                 <div class="kpi-card"><div class="label">Faturamento Liquidado</div><div class="value">R$ ${fmt(cusT)}</div></div>
                 <div class="kpi-card highlight tooltip-container">
                     <div class="label">Economia Base Tabela ℹ️</div><div class="value">R$ ${fmt(ecoT)}</div>
-                    <div class="tooltip-box"><b>Cálculo Financeiro Exato:</b><br>Soma da litragem multiplicada pela diferença entre o <b>Preço Negociado</b> (histórico TruckPag) e o Preço Médio pago na bomba.<br><br><i>Notas sem preço de tabela não entram neste cálculo.</i></div>
+                    <div class="tooltip-box"><b>Cálculo Financeiro Exato:</b><br>Soma da litragem multiplicada pela diferença entre o <b>Preço Negociado</b> e o Preço Médio pago na bomba.</div>
                 </div>
             `;
         }
 
-        // --- 6. RENDERIZAÇÃO DAS ABAS (GRÁFICOS, TABELAS E MAPAS) ---
+        // --- 6. RENDERIZAÇÃO DAS ABAS ---
         function renderTabContent() {
             if(todosPostos.length === 0) return;
             const activeTab = document.querySelector('.nav-tab.active')?.dataset.tab;
@@ -745,7 +761,7 @@
             }
 
             if(activeTab === 'tab-abc') {
-                Chart.getChart('cAbcBar')?.destroy(); Chart.getChart('cAbcPie')?.destroy();
+                Chart.getChart('cAbcBar')?.destroy();
                 new Chart(document.getElementById('cAbcBar'), { type: 'bar', data: { labels: todosPostos.slice(0,30).map((_,i)=>i+1), datasets: [{ label: 'Vol.', data: todosPostos.slice(0,30).map(p=>p.volume), backgroundColor: todosPostos.slice(0,30).map(p=>p.abc==='A'?'#10b981':(p.abc==='B'?'#f59e0b':'#ef4444')) }] }, options: { maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip: tooltipAbc } } });
                 
                 const tb = document.getElementById('tbPostos'); tb.innerHTML = '';
@@ -907,7 +923,7 @@
                 }
             } catch (e) {
                 status.innerHTML = `❌ Servidor Inativo.`; status.className = 'status-msg error';
-                showToast('Falha ao conectar no Backend (Túnel Cloudflare Offline).', 'error');
+                showToast('Falha ao conectar no Backend (API Offline).', 'error');
             }
         }
 
@@ -928,7 +944,10 @@
         }
 
         document.getElementById('btnConectar').addEventListener('click', fetchAPILocal);
-        document.getElementById('btnRecarregarTela').addEventListener('click', fetchAPILocal);
+        document.getElementById('btnRecarregarTela').addEventListener('click', () => {
+            const tb = document.getElementById('tbInt'); if(tb) tb.innerHTML = '';
+            fetchAPILocal();
+        });
         document.getElementById('btnSyncApi').addEventListener('click', acionarRoboTruckPag);
         document.getElementById('btnExportCSV').addEventListener('click', exportarCSV);
         document.getElementById('filtroTipoAbast').addEventListener('change', () => { if(transacoesGlobais.length>0){ processarDados(); renderTabContent(); } });
