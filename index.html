@@ -83,10 +83,11 @@
         .btn-filter-main { padding: 14px; background: var(--brand-orange); color: #fff; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform:uppercase; letter-spacing: 1px; transition: 0.2s;}
         .btn-filter-main:hover { background: var(--brand-orange-hover); transform: translateY(-1px);}
         
-        .status-msg { font-size: 12px; padding: 12px; border-radius: 6px; text-align: center; font-weight: 700; margin-top:5px; transition: 0.3s;}
+        .status-msg { font-size: 12px; padding: 12px; border-radius: 6px; text-align: center; font-weight: 700; margin-top:5px; transition: 0.3s; word-break: break-word;}
         .status-msg.success { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
         .status-msg.warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
         .status-msg.error { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .status-msg.loading { background: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
 
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow: hidden; width: 100%; transition: all 0.3s ease; position: relative;}
         .top-header { background: var(--surface-color); padding: 12px 25px; display: flex; justify-content: space-between; align-items:center; border-bottom: 1px solid var(--border-color); }
@@ -98,6 +99,12 @@
         .user-tag { font-size: 13px; font-weight: 700; color: var(--text-main); background: var(--bg-color); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--border-color); white-space: nowrap;}
         .icon-action-btn { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: 700; font-size: 13px; transition: 0.2s; display:flex; align-items:center; gap:5px; white-space: nowrap;}
         .icon-action-btn:hover { background: var(--border-color); }
+
+        /* Badge de fonte de dados */
+        .source-badge { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 10px; letter-spacing: 0.5px; text-transform: uppercase; white-space: nowrap; }
+        .source-badge.api { background: rgba(16,185,129,0.15); color: var(--success); border: 1px solid rgba(16,185,129,0.4);}
+        .source-badge.csv { background: rgba(245,158,11,0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.4);}
+        .source-badge.off { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid rgba(239,68,68,0.4);}
         
         .dashboard { flex: 1; padding: 25px; overflow-y: auto; overflow-x: hidden; }
 
@@ -143,8 +150,12 @@
         .toolbar-int input { flex:1; min-width:300px; padding:12px 15px; border-radius:6px; border:1px solid var(--border-color); background:var(--surface-color); color:var(--text-main); outline:none; font-size:14px; font-weight:600;}
         
         .btn-sync { padding:10px 15px; background:transparent; color:var(--text-main); border:1px solid var(--border-color); border-radius:6px; font-weight:bold; cursor:pointer; display:flex; align-items:center; gap:5px; transition:0.2s;}
+        .btn-sync:hover { background: var(--border-color); }
         .btn-sync-api { padding:10px 15px; background:var(--brand-blue); color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
+        .btn-sync-api:hover { background: #0f172a; }
+        .btn-sync-api:disabled { opacity: 0.5; cursor: wait; }
         .btn-export { padding:10px 15px; background:#10b981; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer; transition:0.2s; display:flex; align-items:center; gap:5px;}
+        .btn-export:hover { background:#059669; }
 
         .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800; text-transform: uppercase; width:max-content; }
         .badge.green { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
@@ -174,17 +185,16 @@
             th, td { white-space: nowrap; padding: 10px 8px; }
             .map-container { height: 450px; }
             .map-floating-left { width: calc(100% - 30px); top: auto; bottom: 15px; left: 15px; right: 15px; max-height: 200px; overflow-y: auto; }
+            .source-badge { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Container Toast Notifications -->
     <div id="toast-container"></div>
-
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
-    <!-- Modais (Login, Admin, Settings) -->
+    <!-- LOGIN -->
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-card" id="loginCard">
             <div class="auth-logo-text" id="logoText">Cavalheiro<span style="color:var(--brand-orange)">log</span></div>
@@ -197,6 +207,7 @@
         </div>
     </div>
 
+    <!-- ADMIN -->
     <div class="auth-overlay" id="adminModal" style="display:none; background:rgba(0,0,0,0.8); z-index:999999;">
         <div class="auth-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -222,6 +233,7 @@
         </div>
     </div>
 
+    <!-- SETTINGS -->
     <div class="auth-overlay" id="settingsModal" style="display:none; background:rgba(0,0,0,0.8); z-index:999999;">
         <div class="auth-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -243,14 +255,15 @@
             </div>
             <hr style="border-color:var(--border-color); margin:10px 0;">
             <div class="auth-field">
-                <label>URL do Backend (Túnel Cloudflare)</label>
-                <input type="text" id="cfgApiUrl" placeholder="Ex: https://novo-link.trycloudflare.com">
+                <label>URL do Backend (Túnel Cloudflare / Localhost)</label>
+                <input type="text" id="cfgApiUrl" placeholder="Ex: https://novo-link.trycloudflare.com ou http://localhost:3000">
+                <small style="font-size:10px; color:var(--text-muted); margin-top:4px;">Deixe vazio para operar somente em modo CSV local.</small>
             </div>
             <button onclick="salvarConfig()" class="auth-btn" style="margin-top:10px;">Salvar Configurações</button>
         </div>
     </div>
 
-    <!-- Barra Lateral de Filtros -->
+    <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <span>FILTROS DA FROTA</span>
@@ -296,13 +309,14 @@
         </div>
     </div>
 
-    <!-- Área de Exibição Principal -->
+    <!-- MAIN -->
     <div class="main-content">
         <header class="top-header">
             <div class="header-left">
                 <button class="btn-hamburger" onclick="toggleSidebar()">☰</button>
                 <button class="btn-open-sidebar" id="btnOpenSidebar" onclick="toggleSidebar()">▶ Filtros</button>
                 <div style="font-size:22px; font-weight:800; color:var(--brand-blue);">Cavalheiro<span style="color:var(--brand-orange)">log</span></div>
+                <span class="source-badge off" id="sourceBadge">Offline</span>
             </div>
             <div class="header-right">
                 <span class="user-tag" id="loggedUserTag">👤 Convidado</span>
@@ -408,12 +422,13 @@
         </div>
     </div>
 
-    <!-- =========================================
-         LÓGICA JAVASCRIPT DO SISTEMA
-    ========================================= -->
+    <!-- =============================================
+         LÓGICA JAVASCRIPT
+    ============================================== -->
     <script>
-        // --- 1. UTILITÁRIOS GERAIS ---
-        
+        // ============================================================
+        // 1. UTILITÁRIOS
+        // ============================================================
         function showToast(message, type = 'success') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
@@ -423,13 +438,101 @@
             setTimeout(() => { toast.style.animation = 'fadeOut 0.3s forwards'; setTimeout(() => toast.remove(), 300); }, 3500);
         }
 
-        const URL_TUNEL = 'http://localhost:3000'; 
-        let apiUrlAtual = localStorage.getItem('cavalheiro_api_url') || URL_TUNEL;
+        const CSV_FILENAME = 'analitico-abastecimentos.csv';
+        let apiUrlAtual = localStorage.getItem('cavalheiro_api_url') || '';
         let cfgColor = localStorage.getItem('cfg_color') || '#3b82f6';
         let cfgChartType = localStorage.getItem('cfg_chart') || 'bar';
         document.documentElement.style.setProperty('--chart-color-1', cfgColor);
 
-        // --- 2. GESTÃO DE ACESSOS E LOGIN ---
+        // Fonte ativa: 'api' | 'csv' | 'off'
+        let fonteAtiva = 'off';
+        function setSourceBadge(tipo, texto) {
+            const el = document.getElementById('sourceBadge');
+            fonteAtiva = tipo;
+            el.className = 'source-badge ' + tipo;
+            el.textContent = texto;
+        }
+
+        // ============================================================
+        // 2. PARSER DO CSV (FALLBACK OFFLINE)
+        // ============================================================
+        function parseNumBR(str) {
+            if (str === null || str === undefined) return 0;
+            let s = String(str).replace(/R\$\s*/g, '').replace(/\s+/g, '').trim();
+            if (!s || s === '-' || s === 'undefined') return 0;
+            s = s.replace(/\./g, '').replace(',', '.');
+            const n = parseFloat(s);
+            return isNaN(n) ? 0 : n;
+        }
+
+        function parsearCSV(csvText) {
+            const linhas = csvText.split(/\r?\n/);
+            const transacoes = [];
+            let veiculoAtual = { placa: '', modelo: '' };
+
+            for (let i = 0; i < linhas.length; i++) {
+                const linha = linhas[i];
+                if (!linha || !linha.trim()) continue;
+
+                if (linha.startsWith('Cliente;')) {
+                    const prox = linhas[i + 1];
+                    if (prox) {
+                        const camposV = prox.split(';');
+                        veiculoAtual = { placa: (camposV[1] || '').trim(), modelo: (camposV[3] || '').trim() };
+                        i++;
+                    }
+                    continue;
+                }
+                if (linha.startsWith('Transacao;')) continue;
+                if (linha.startsWith(';') && linha.includes('Totais do veiculo')) continue;
+
+                const campos = linha.split(';');
+                if (campos.length < 14) continue;
+                if (!/^\d+$/.test(campos[0])) continue;
+
+                const transacao = campos[0];
+                const data = campos[1];
+                const hora = campos[2] || '00:00';
+                const estabelecimento = (campos[3] || '').trim();
+                const cidadeUf = campos[4] || '';
+                const motorista = (campos[5] || '').trim();
+                const litragem = campos[8];
+                const combustivel = (campos[9] || '').trim();
+                const precoTransacao = campos[10];
+                const precoNegociado = campos[11];
+                const valorTotal = campos[12];
+                const nfe = (campos[13] || '').trim();
+
+                const partes = cidadeUf.split('/');
+                const cidade = (partes[0] || '').trim();
+                const uf = (partes[1] || '').trim();
+
+                const volume = parseNumBR(litragem);
+                const valorLitro = parseNumBR(precoTransacao);
+                const precoTabela = parseNumBR(precoNegociado);
+                const valorTotalNum = parseNumBR(valorTotal);
+                const tipoAbast = /BOMBA INTERNA/i.test(estabelecimento) ? 'Interno' : 'Externo';
+
+                let dataISO = '';
+                const pd = data.split('/');
+                if (pd.length === 3) dataISO = `${pd[2]}-${pd[1]}-${pd[0]} ${hora}`;
+
+                transacoes.push({
+                    id: transacao, data: dataISO, estabelecimento, cidade, uf,
+                    placa: veiculoAtual.placa, motorista, volume, combustivel,
+                    valor_litro: valorLitro, preco_tabela: precoTabela, valor_total: valorTotalNum,
+                    chave_nfe: nfe, tipoAbastecimento: tipoAbast,
+                    status_nfe: nfe ? 'Vinculada' : 'Pendente',
+                    cnpj_posto: getCNPJEstruturado(uf, cidade, estabelecimento),
+                    cnpj_cliente: ''
+                });
+            }
+            return transacoes;
+        }
+
+        // ============================================================
+        // 3. LOGIN E GESTÃO DE USUÁRIOS
+        // ============================================================
         const MASTER_ADMIN = 'pedro.cavalheirolog';
         async function hashPassword(senha) {
             const encoder = new TextEncoder();
@@ -459,7 +562,7 @@
                 sessionStorage.setItem('logged_user', user);
                 
                 let uPerms = users[user].perms;
-                if(uPerms.stations !== undefined && uPerms.precos === undefined) { uPerms.precos = uPerms.stations; }
+                if (uPerms.stations !== undefined && uPerms.precos === undefined) uPerms.precos = uPerms.stations;
                 sessionStorage.setItem('user_perms', JSON.stringify(uPerms));
                 
                 setTimeout(() => { window.location.reload(); }, 1500);
@@ -472,9 +575,7 @@
             const newUser = document.getElementById('regUser').value.trim().toLowerCase();
             const newPass = document.getElementById('regPass').value;
             let users = JSON.parse(localStorage.getItem('cavalheiro_users') || '{}');
-            if (users[newUser]) {
-                showToast('Usuário já existe!', 'error'); return;
-            }
+            if (users[newUser]) { showToast('Usuário já existe!', 'error'); return; }
             users[newUser] = {
                 hash: await hashPassword(newPass), isAdmin: false,
                 perms: {
@@ -490,7 +591,9 @@
 
         document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.clear(); window.location.reload(); });
 
-        // --- 3. MANIPULAÇÃO DE INTERFACE E FILTROS ---
+        // ============================================================
+        // 4. CONFIGURAÇÕES E UI
+        // ============================================================
         window.salvarConfig = function() {
             cfgColor = document.getElementById('cfgColor1').value;
             cfgChartType = document.getElementById('cfgChartType').value;
@@ -507,11 +610,12 @@
             document.getElementById('box_classabc').style.display = vAbc ? 'flex' : 'none';
 
             const novaApiUrl = document.getElementById('cfgApiUrl').value.trim().replace(/\/$/, "");
-            if(novaApiUrl) { apiUrlAtual = novaApiUrl; localStorage.setItem('cavalheiro_api_url', apiUrlAtual); }
+            if (novaApiUrl) { apiUrlAtual = novaApiUrl; localStorage.setItem('cavalheiro_api_url', apiUrlAtual); }
+            else { apiUrlAtual = ''; localStorage.removeItem('cavalheiro_api_url'); }
 
             document.getElementById('settingsModal').style.display = 'none';
             showToast('Layout atualizado com sucesso!', 'success');
-            if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-overview') renderTabContent();
+            if (document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-overview') renderTabContent();
         };
 
         window.toggleSidebar = function() {
@@ -523,53 +627,52 @@
                 const btnOpen = document.getElementById('btnOpenSidebar');
                 sidebar.classList.toggle('collapsed');
                 btnOpen.style.display = sidebar.classList.contains('collapsed') ? 'block' : 'none';
-                setTimeout(()=>{ Object.values(Chart.instances).forEach(c=>c.resize()); if(mapInstance) mapInstance.invalidateSize(); }, 400);
+                setTimeout(() => { Object.values(Chart.instances).forEach(c => c.resize()); if (mapInstance) mapInstance.invalidateSize(); }, 400);
             }
         };
 
-        function preencherAnos() { const a = new Date().getFullYear(); const s = document.getElementById('selAno'); [a, a-1, a-2].forEach(v => s.innerHTML += `<option value="${v}">${v}</option>`); }
-        
+        function preencherAnos() {
+            const a = new Date().getFullYear(); const s = document.getElementById('selAno');
+            [a, a-1, a-2, a-3].forEach(v => s.innerHTML += `<option value="${v}">${v}</option>`);
+        }
+
         window.alternarCamposPeriodo = function() {
             const val = document.getElementById('tipoPeriodoSelect').value;
             document.getElementById('boxDiario').style.display = val === 'diario' ? 'block' : 'none';
             document.getElementById('boxMensal').style.display = val === 'mensal' ? 'block' : 'none';
         };
 
-        // A CORREÇÃO DE DATAS INTELIGENTE AQUI
         function getDatasFiltro() {
             const tipo = document.getElementById('tipoPeriodoSelect').value;
             let dtIni, dtFim;
-
             if (tipo === 'diario') {
                 dtIni = document.getElementById('dataInicio').value;
                 dtFim = document.getElementById('dataFim').value;
-                
-                // Auto-Swap se a data inicial for maior que a final
-                if (dtIni > dtFim) {
-                    const temp = dtIni;
-                    dtIni = dtFim;
-                    dtFim = temp;
+                if (dtIni && dtFim && dtIni > dtFim) {
+                    const temp = dtIni; dtIni = dtFim; dtFim = temp;
                     document.getElementById('dataInicio').value = dtIni;
                     document.getElementById('dataFim').value = dtFim;
                     showToast('Datas invertidas! O sistema corrigiu automaticamente.', 'warning');
                 }
             } else {
-                const ano = document.getElementById('selAno').value; 
+                const ano = document.getElementById('selAno').value;
                 const mes = document.getElementById('selMes').value;
                 const ultimoDia = new Date(ano, parseInt(mes), 0).getDate();
-                dtIni = `${ano}-${mes}-01`; 
-                dtFim = `${ano}-${mes}-${String(ultimoDia).padStart(2,'0')}`;
+                dtIni = `${ano}-${mes}-01`;
+                dtFim = `${ano}-${mes}-${String(ultimoDia).padStart(2, '0')}`;
             }
             return { dtIni, dtFim };
         }
 
         function formatarCNPJ(cnpj) {
-            if(!cnpj) return ''; cnpj = cnpj.replace(/\D/g, ''); if(cnpj.length !== 14) return cnpj;
+            if (!cnpj) return ''; cnpj = cnpj.replace(/\D/g, ''); if (cnpj.length !== 14) return cnpj;
             return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5");
         }
-        
+
         function getCNPJEstruturado(uf, cidade, posto) {
-            uf = (uf || '').toUpperCase(); cid = (cidade || '').toUpperCase(); p = (posto || '').toUpperCase();
+            uf = (uf || '').toUpperCase();
+            const cid = (cidade || '').toUpperCase();
+            const p = (posto || '').toUpperCase();
             if (uf === 'PA' && p.includes('MIRIAM') && (cid.includes('ITAITUBA') || cid.includes('MIRITITUBA'))) return '07.689.042/0009-88';
             const r73 = ['SP','MG','BA','PE','MA','SE','AL','TO','PA','ES','RJ','PI'];
             const r88 = ['MT'];
@@ -579,11 +682,11 @@
         }
 
         window.baixarNFePdf = function(chave) {
-            if(!chave) { showToast('Chave NFe não disponível.', 'error'); return; }
+            if (!chave) { showToast('Chave NFe não disponível.', 'error'); return; }
             navigator.clipboard.writeText(chave).then(() => {
                 showToast('Chave copiada! Pressione "Colar" no portal FSist.', 'success');
                 setTimeout(() => window.open('https://www.fsist.com.br/', '_blank'), 1500);
-            }).catch(err => {
+            }).catch(() => {
                 prompt('Seu navegador bloqueou a cópia automática. Copie a chave abaixo:', chave);
                 window.open('https://www.fsist.com.br/', '_blank');
             });
@@ -595,13 +698,13 @@
             transacoesFiltradas.forEach(t => {
                 const dtStr = t.data ? t.data.split(' ')[0].split('-').reverse().join('/') : 'ND';
                 const row = [
-                    dtStr, t.id, `"${t.estabelecimento}"`, `"${t.cidade}"`, t.uf, t.tipoAbastecimento, t.placa, `"${t.motorista}"`, 
-                    String(t.volume).replace('.', ','), String(t.valor_total).replace('.', ','), String(t.valor_litro).replace('.', ','), 
-                    String(t.preco_tabela||0).replace('.', ','), t.status_nfe, t.chave_nfe, t.cnpj_posto, t.cnpj_cliente, t.combustivel
+                    dtStr, t.id, `"${t.estabelecimento}"`, `"${t.cidade}"`, t.uf, t.tipoAbastecimento, t.placa, `"${t.motorista}"`,
+                    String(t.volume).replace('.', ','), String(t.valor_total).replace('.', ','), String(t.valor_litro).replace('.', ','),
+                    String(t.preco_tabela || 0).replace('.', ','), t.status_nfe, t.chave_nfe, t.cnpj_posto, t.cnpj_cliente, t.combustivel
                 ];
                 csv += row.join(";") + "\n";
             });
-            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); 
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a"); const dts = getDatasFiltro();
             link.setAttribute("href", URL.createObjectURL(blob));
             link.setAttribute("download", `auditoria_cavalheirolog_${dts.dtIni}_ate_${dts.dtFim}.csv`);
@@ -609,9 +712,15 @@
             showToast('Arquivo exportado com sucesso!', 'success');
         };
 
-        // --- 4. MOTOR DE ANÁLISE DE DADOS (FRONTEND) ---
-        let transacoesGlobais = [], transacoesFiltradas = [], todosPostos = [];
+        // ============================================================
+        // 5. MOTOR DE ANÁLISE
+        // ============================================================
+        let todasTransacoes = [];
+        let transacoesGlobais = [];
+        let transacoesFiltradas = [];
+        let todosPostos = [];
         let mapInstance = null, heatLayer = null, markersLayer = null;
+        let baseCarregada = false;
 
         const coordsBrasil = {
             'CUIABA': {lat:-15.601, lng:-56.097}, 'RONDONOPOLIS': {lat:-16.467, lng:-54.636},
@@ -624,29 +733,73 @@
             'CACOAL': {lat:-11.438, lng:-61.447}, 'CANDEIAS DO JAMARI': {lat:-8.800, lng:-63.696},
             'SAO PAULO': {lat:-23.550, lng:-46.633}, 'CAMPINAS': {lat:-22.909, lng:-47.062},
             'GUARULHOS': {lat:-23.454, lng:-46.533}, 'ARARAQUARA': {lat:-21.794, lng:-48.176},
-            'FERNANDOPOLIS': {lat:-20.283, lng:-50.246}, 'CASCAVEL': {lat:-24.957, lng:-53.459}, 
+            'FERNANDOPOLIS': {lat:-20.283, lng:-50.246}, 'CASCAVEL': {lat:-24.957, lng:-53.459},
             'CURITIBA': {lat:-25.428, lng:-49.273}, 'CAMPO GRANDE': {lat:-20.469, lng:-54.620},
             'DOURADOS': {lat:-22.223, lng:-54.806}, 'ITAOBIM': {lat:-16.622, lng:-41.503},
             'CENTRALINA': {lat:-18.583, lng:-49.194}, 'POCOES': {lat:-14.529, lng:-40.366},
             'URUACU': {lat:-14.524, lng:-49.140}, 'GENERAL CARNEIRO': {lat:-15.711, lng:-52.758},
-            'MATUPA': {lat:-10.233, lng:-54.922}
+            'MATUPA': {lat:-10.233, lng:-54.922}, 'NOVA ANDRADINA': {lat:-22.238, lng:-53.349},
+            'PENAPOLIS': {lat:-21.418, lng:-50.077}, 'MARINGA': {lat:-23.420, lng:-51.933},
+            'LONDRINA': {lat:-23.304, lng:-51.169}, 'PONTA GROSSA': {lat:-25.091, lng:-50.166},
+            'JOINVILLE': {lat:-26.304, lng:-48.848}, 'FLORIANOPOLIS': {lat:-27.595, lng:-48.548},
+            'ITAJAI': {lat:-26.907, lng:-48.661}, 'BALNEARIO CAMBORIU': {lat:-26.990, lng:-48.635},
+            'RIO DE JANEIRO': {lat:-22.906, lng:-43.172}, 'BARRA MANSA': {lat:-22.544, lng:-44.171},
+            'TRES RIOS': {lat:-22.116, lng:-43.209}, 'JUIZ DE FORA': {lat:-21.764, lng:-43.350},
+            'UBERLANDIA': {lat:-18.918, lng:-48.277}, 'UBERABA': {lat:-19.748, lng:-47.937},
+            'BELO HORIZONTE': {lat:-19.917, lng:-43.934}, 'SABARA': {lat:-19.887, lng:-43.807},
+            'CONTAGEM': {lat:-19.932, lng:-44.054}, 'MONTES CLAROS': {lat:-16.728, lng:-43.861},
+            'GOVERNADOR VALADARES': {lat:-18.851, lng:-41.949}, 'IPATINGA': {lat:-19.468, lng:-42.537},
+            'SALVADOR': {lat:-12.971, lng:-38.501}, 'FEIRA DE SANTANA': {lat:-12.267, lng:-38.966},
+            'BARREIRAS': {lat:-12.152, lng:-44.990}, 'VITORIA DA CONQUISTA': {lat:-14.850, lng:-40.839},
+            'RECIFE': {lat:-8.054, lng:-34.881}, 'JABOATAO': {lat:-8.113, lng:-34.994},
+            'CARUARU': {lat:-8.282, lng:-35.976}, 'PETROLINA': {lat:-9.389, lng:-40.503},
+            'FORTALEZA': {lat:-3.732, lng:-38.527}, 'SOBRAL': {lat:-3.687, lng:-40.349},
+            'SAO LUIS': {lat:-2.539, lng:-44.282}, 'IMPERATRIZ': {lat:-5.526, lng:-47.492},
+            'BELEM': {lat:-1.456, lng:-48.503}, 'MARITUBA': {lat:-1.356, lng:-48.343},
+            'ANANINDEUA': {lat:-1.365, lng:-48.373}, 'SANTAREM': {lat:-2.443, lng:-54.708},
+            'MARABA': {lat:-5.368, lng:-49.118}, 'ARAGUAINA': {lat:-7.191, lng:-48.207},
+            'PALMAS': {lat:-10.168, lng:-48.332}, 'GOIANIA': {lat:-16.686, lng:-49.264},
+            'APARECIDA DE GOIANIA': {lat:-16.823, lng:-49.243}, 'ANAPOLIS': {lat:-16.328, lng:-48.953},
+            'RIO VERDE': {lat:-17.797, lng:-50.927}, 'JATAI': {lat:-17.881, lng:-51.715},
+            'TANGARA DA SERRA': {lat:-14.622, lng:-57.488}, 'CACERES': {lat:-16.076, lng:-57.681},
+            'BARRA DO GARCAS': {lat:-15.890, lng:-52.257}, 'BRASILIA': {lat:-15.794, lng:-47.882},
+            'LUZIANIA': {lat:-16.252, lng:-47.950}, 'ITUMBIARA': {lat:-18.419, lng:-49.215},
+            'CATALAO': {lat:-18.166, lng:-47.944}, 'PORANGATU': {lat:-13.443, lng:-49.143},
+            'SAO SIMAO': {lat:-18.994, lng:-50.548}, 'AQUIDAUANA': {lat:-20.470, lng:-55.787},
+            'CORUMBA': {lat:-19.007, lng:-57.653}, 'PONTA PORA': {lat:-22.536, lng:-55.726},
+            'NAVIRAI': {lat:-23.065, lng:-54.192}, 'MUNDO NOVO': {lat:-23.937, lng:-54.281},
+            'PARANAIBA': {lat:-19.677, lng:-51.191}, 'TRES LAGOAS': {lat:-20.785, lng:-51.701},
+            'CHAPADAO DO SUL': {lat:-18.795, lng:-52.621}, 'CASSILANDIA': {lat:-19.119, lng:-51.730},
+            'ALTO TAQUARI': {lat:-17.826, lng:-53.278}, 'GUARANTA DO NORTE': {lat:-10.035, lng:-54.881},
+            'ITAITUBA': {lat:-4.282, lng:-55.983}, 'RIO BRANCO': {lat:-9.975, lng:-67.810},
+            'CRUZEIRO DO SUL': {lat:-7.628, lng:-72.677}, 'CAMPOS DOS GOYTACAZES': {lat:-21.752, lng:-41.331},
+            'MACAE': {lat:-22.371, lng:-41.786}, 'RESENDE': {lat:-22.470, lng:-44.447},
+            'VOLTA REDONDA': {lat:-22.521, lng:-44.104}, 'ANGRA DOS REIS': {lat:-23.007, lng:-44.318},
+            'NOVA IGUACU': {lat:-22.759, lng:-43.451}, 'DUQUE DE CAXIAS': {lat:-22.786, lng:-43.312},
+            'SAO GONCALO': {lat:-22.827, lng:-43.053}, 'NITEROI': {lat:-22.883, lng:-43.104},
+            'CACHOEIRO DE ITAPEMIRIM': {lat:-20.848, lng:-41.113}, 'COLATINA': {lat:-19.539, lng:-40.630},
+            'LINHARES': {lat:-19.391, lng:-40.073}, 'SAO MATEUS': {lat:-18.716, lng:-39.858},
+            'VILA VELHA': {lat:-20.330, lng:-40.292}, 'SERRA': {lat:-20.128, lng:-40.308},
+            'GUARAPARI': {lat:-20.664, lng:-40.498}
         };
-        const coordsEstados = { 'MT':{lat:-12.6,lng:-55.4}, 'PR':{lat:-24.8,lng:-51.5}, 'SP':{lat:-23.5,lng:-46.6}, 'RO':{lat:-10.9,lng:-62.8}, 'MS':{lat:-20.5,lng:-54.5}, 'GO':{lat:-15.9,lng:-49.8}, 'MG':{lat:-18.5,lng:-44.4}, 'BA':{lat:-12.9,lng:-41.6} };
+        const coordsEstados = {
+            'MT':{lat:-12.6,lng:-55.4}, 'PR':{lat:-24.8,lng:-51.5}, 'SP':{lat:-23.5,lng:-46.6},
+            'RO':{lat:-10.9,lng:-62.8}, 'MS':{lat:-20.5,lng:-54.5}, 'GO':{lat:-15.9,lng:-49.8},
+            'MG':{lat:-18.5,lng:-44.4}, 'BA':{lat:-12.9,lng:-41.6}, 'RJ':{lat:-22.9,lng:-43.2},
+            'ES':{lat:-20.3,lng:-40.3}, 'SC':{lat:-27.2,lng:-50.2}, 'RS':{lat:-30.0,lng:-51.2},
+            'PE':{lat:-8.0,lng:-34.9}, 'CE':{lat:-3.7,lng:-38.5}, 'PA':{lat:-1.4,lng:-48.5},
+            'TO':{lat:-7.2,lng:-48.2}, 'MA':{lat:-2.5,lng:-44.3}, 'PB':{lat:-7.1,lng:-34.9},
+            'RN':{lat:-5.8,lng:-35.2}, 'PI':{lat:-5.1,lng:-42.8}, 'AL':{lat:-9.7,lng:-35.7},
+            'SE':{lat:-10.9,lng:-37.1}, 'AC':{lat:-9.9,lng:-67.8}, 'AP':{lat:1.4,lng:-51.7},
+            'AM':{lat:-3.1,lng:-60.0}, 'RR':{lat:2.8,lng:-60.7}, 'DF':{lat:-15.8,lng:-47.9}
+        };
 
         function limparNomePosto(nome) {
-            if(!nome) return 'ND'; return nome.replace(/POSTO EXTERNO - |BOMBA INTERNA - /ig, '').substring(0, 25);
+            if (!nome) return 'ND';
+            return nome.replace(/POSTO EXTERNO - |BOMBA INTERNA - /ig, '').substring(0, 25);
         }
 
         function processarDados() {
-            // Inteligência Auto-Correct
-            transacoesGlobais.forEach(t => {
-                let estabDB = (t.estabelecimento || '').toUpperCase();
-                let tipoDB = (t.tipoAbastecimento || '').toUpperCase();
-                if (!tipoDB.includes('INTERNO') && !tipoDB.includes('EXTERNO')) {
-                    t.tipoAbastecimento = estabDB.includes('INTERNA') ? 'Interno' : 'Externo';
-                }
-            });
-
             const tipoAbast = document.getElementById('filtroTipoAbast').value;
             transacoesFiltradas = transacoesGlobais.filter(t => {
                 if (tipoAbast === 'todos') return true;
@@ -655,7 +808,7 @@
 
             const statusBox = document.getElementById('statusMsg');
             if (statusBox.className.includes('success') && transacoesGlobais.length > 0) {
-                statusBox.innerHTML = `✅ ${transacoesFiltradas.length} Listados (Local)`;
+                statusBox.innerHTML = `✅ ${transacoesFiltradas.length} Listados`;
             }
 
             const map = new Map();
@@ -663,25 +816,26 @@
 
             transacoesFiltradas.forEach(t => {
                 const key = t.estabelecimento || 'POSTO ND';
-                if (!map.has(key)) map.set(key, { posto: key, cidade: t.cidade||'ND', uf: t.uf||'ND', cnpj_posto: t.cnpj_posto, volume: 0, custo: 0, economia: 0, custoTabela: 0, volComTabela: 0 });
+                if (!map.has(key)) map.set(key, { posto: key, cidade: t.cidade || 'ND', uf: t.uf || 'ND', cnpj_posto: t.cnpj_posto, volume: 0, custo: 0, economia: 0, custoTabela: 0, volComTabela: 0 });
                 const p = map.get(key);
-                
+
                 const vol = parseFloat(t.volume) || 0;
                 const val = parseFloat(t.valor_total) || 0;
                 const precoTab = parseFloat(t.preco_tabela) || 0;
 
-                p.volume += vol; p.custo += val; 
+                p.volume += vol; p.custo += val;
 
                 if (precoTab > 0) {
                     p.custoTabela += (vol * precoTab);
                     p.volComTabela += vol;
-                    const eco = (vol * precoTab) - val; 
+                    const eco = (vol * precoTab) - val;
                     p.economia += eco;
                     ecoT += eco;
                 }
 
                 volT += vol; cusT += val;
-                if ((t.combustivel || '').toUpperCase().includes('ARLA')) volArla += vol; else volDiesel += vol;
+                if ((t.combustivel || '').toUpperCase().includes('ARLA')) volArla += vol;
+                else volDiesel += vol;
             });
 
             todosPostos = Array.from(map.values()).sort((a, b) => b.volume - a.volume);
@@ -690,9 +844,9 @@
                 p.precoMedio = p.volume > 0 ? p.custo / p.volume : 0;
                 p.precoTabelaMedio = p.volComTabela > 0 ? p.custoTabela / p.volComTabela : 0;
                 p.divergenciaLitro = p.precoTabelaMedio > 0 ? p.precoMedio - p.precoTabelaMedio : 0;
-                
+
                 acum += p.volume; p.percentualAcum = volT > 0 ? (acum / volT) * 100 : 0;
-                p.abc = p.percentualAcum <= 80 ? 'A' : (p.percentualAcum <= 95 ? 'B' : 'C'); 
+                p.abc = p.percentualAcum <= 80 ? 'A' : (p.percentualAcum <= 95 ? 'B' : 'C');
             });
 
             document.getElementById('kpiGrid').innerHTML = `
@@ -709,75 +863,77 @@
             `;
         }
 
-        // --- 6. RENDERIZAÇÃO DAS ABAS ---
+        // ============================================================
+        // 6. RENDERIZAÇÃO DAS ABAS
+        // ============================================================
         function renderTabContent() {
-            if(todosPostos.length === 0) return;
+            if (todosPostos.length === 0) return;
             const activeTab = document.querySelector('.nav-tab.active')?.dataset.tab;
-            if(!activeTab) return;
-            const color = cfgColor; 
-            
+            if (!activeTab) return;
+            const color = cfgColor;
+
             const tooltipAbc = { callbacks: { title: function(ctx) { return todosPostos[ctx[0].dataIndex].posto; } } };
             const chartOpt = { maintainAspectRatio: false, plugins: { legend: { display: false } } };
 
-            if(activeTab === 'tab-overview') {
+            if (activeTab === 'tab-overview') {
                 Chart.getChart('cTopVol')?.destroy(); Chart.getChart('cTopEco')?.destroy(); Chart.getChart('cClassABC')?.destroy();
                 const top10 = todosPostos.slice(0, 10);
-                new Chart(document.getElementById('cTopVol'), { type: cfgChartType, data: { labels: top10.map(p=>limparNomePosto(p.posto)), datasets: [{ label: 'Litros', data: top10.map(p=>p.volume), backgroundColor: color }] }, options: chartOpt});
-                const topS = [...todosPostos].sort((a,b)=>b.economia - a.economia).slice(0,10);
-                new Chart(document.getElementById('cTopEco'), { type: 'bar', data: { labels: topS.map(p=>limparNomePosto(p.posto)), datasets: [{ label: 'R$', data: topS.map(p=>p.economia), backgroundColor: '#10b981' }] }, options: chartOpt});
-                new Chart(document.getElementById('cClassABC'), { type: 'doughnut', data: { labels: ['A','B','C'], datasets: [{ data: [todosPostos.filter(p=>p.abc==='A').length, todosPostos.filter(p=>p.abc==='B').length, todosPostos.filter(p=>p.abc==='C').length], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'] }] }, options:{maintainAspectRatio:false}});
+                new Chart(document.getElementById('cTopVol'), { type: cfgChartType, data: { labels: top10.map(p => limparNomePosto(p.posto)), datasets: [{ label: 'Litros', data: top10.map(p => p.volume), backgroundColor: color }] }, options: chartOpt });
+                const topS = [...todosPostos].sort((a, b) => b.economia - a.economia).slice(0, 10);
+                new Chart(document.getElementById('cTopEco'), { type: 'bar', data: { labels: topS.map(p => limparNomePosto(p.posto)), datasets: [{ label: 'R$', data: topS.map(p => p.economia), backgroundColor: '#10b981' }] }, options: chartOpt });
+                new Chart(document.getElementById('cClassABC'), { type: 'doughnut', data: { labels: ['A','B','C'], datasets: [{ data: [todosPostos.filter(p => p.abc === 'A').length, todosPostos.filter(p => p.abc === 'B').length, todosPostos.filter(p => p.abc === 'C').length], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'] }] }, options: { maintainAspectRatio: false } });
             }
 
-            if(activeTab === 'tab-temporal') {
+            if (activeTab === 'tab-temporal') {
                 Chart.getChart('cEvoDual')?.destroy();
                 const evoMap = new Map();
                 const isMensal = document.getElementById('tipoPeriodoSelect').value === 'mensal';
-                
+
                 transacoesFiltradas.forEach(t => {
                     let d = t.data ? t.data.split(' ')[0] : '2026-01-01';
-                    if(isMensal) d = d.substring(0, 7);
-                    if(!evoMap.has(d)) evoMap.set(d, {vol:0, custo:0});
+                    if (isMensal) d = d.substring(0, 7);
+                    if (!evoMap.has(d)) evoMap.set(d, { vol: 0, custo: 0 });
                     evoMap.get(d).vol += t.volume; evoMap.get(d).custo += t.valor_total;
                 });
                 const dKeys = Array.from(evoMap.keys()).sort();
-                
-                new Chart(document.getElementById('cEvoDual'), { 
-                    type: 'line', 
-                    data: { 
-                        labels: dKeys, 
+
+                new Chart(document.getElementById('cEvoDual'), {
+                    type: 'line',
+                    data: {
+                        labels: dKeys,
                         datasets: [
-                            { type: 'bar', label: 'Volume (L)', data: dKeys.map(k=>evoMap.get(k).vol), backgroundColor: color, yAxisID: 'y', order: 2, borderRadius: 4 },
-                            { type: 'line', label: 'Preço Médio Pago (R$)', data: dKeys.map(k=>evoMap.get(k).custo/evoMap.get(k).vol), borderColor: '#ff4500', backgroundColor: '#ff4500', borderWidth:3, pointRadius:5, pointHoverRadius:8, yAxisID: 'y1', order: 1 }
-                        ] 
-                    }, 
-                    options: { 
+                            { type: 'bar', label: 'Volume (L)', data: dKeys.map(k => evoMap.get(k).vol), backgroundColor: color, yAxisID: 'y', order: 2, borderRadius: 4 },
+                            { type: 'line', label: 'Preço Médio Pago (R$)', data: dKeys.map(k => evoMap.get(k).custo / evoMap.get(k).vol), borderColor: '#ff4500', backgroundColor: '#ff4500', borderWidth: 3, pointRadius: 5, pointHoverRadius: 8, yAxisID: 'y1', order: 1 }
+                        ]
+                    },
+                    options: {
                         maintainAspectRatio: false, plugins: { legend: { position: 'top' } },
-                        scales: { 
-                            y: { type: 'linear', position: 'left', title: {display: true, text: 'Volume (L)'} }, 
-                            y1: { type: 'linear', position: 'right', title: {display: true, text: 'Preço Pago (R$)'}, grid: {drawOnChartArea: false} } 
-                        } 
+                        scales: {
+                            y: { type: 'linear', position: 'left', title: { display: true, text: 'Volume (L)' } },
+                            y1: { type: 'linear', position: 'right', title: { display: true, text: 'Preço Pago (R$)' }, grid: { drawOnChartArea: false } }
+                        }
                     }
                 });
             }
 
-            if(activeTab === 'tab-abc') {
+            if (activeTab === 'tab-abc') {
                 Chart.getChart('cAbcBar')?.destroy();
-                new Chart(document.getElementById('cAbcBar'), { type: 'bar', data: { labels: todosPostos.slice(0,30).map((_,i)=>i+1), datasets: [{ label: 'Vol.', data: todosPostos.slice(0,30).map(p=>p.volume), backgroundColor: todosPostos.slice(0,30).map(p=>p.abc==='A'?'#10b981':(p.abc==='B'?'#f59e0b':'#ef4444')) }] }, options: { maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip: tooltipAbc } } });
-                
+                new Chart(document.getElementById('cAbcBar'), { type: 'bar', data: { labels: todosPostos.slice(0, 30).map((_, i) => i + 1), datasets: [{ label: 'Vol.', data: todosPostos.slice(0, 30).map(p => p.volume), backgroundColor: todosPostos.slice(0, 30).map(p => p.abc === 'A' ? '#10b981' : (p.abc === 'B' ? '#f59e0b' : '#ef4444')) }] }, options: { maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: tooltipAbc } } });
+
                 const tb = document.getElementById('tbPostos'); tb.innerHTML = '';
-                todosPostos.forEach((p, i) => { 
-                    tb.innerHTML += `<tr><td>${i+1}</td><td><b>${p.posto}</b></td><td>${p.cidade}/${p.uf}</td><td class="text-right">${fmt(p.volume)}</td><td class="text-right">R$ ${fmt(p.precoMedio)}</td><td class="text-right">R$ ${fmt(p.custo)}</td><td class="text-right" style="color:${p.economia>=0?'var(--success)':'var(--danger)'}">R$ ${fmt(p.economia)}</td><td class="text-center"><b><span style="color:${p.abc==='A'?'#10b981':(p.abc==='B'?'#f59e0b':'#ef4444')}">${p.abc}</span></b></td></tr>`; 
+                todosPostos.forEach((p, i) => {
+                    tb.innerHTML += `<tr><td>${i+1}</td><td><b>${p.posto}</b></td><td>${p.cidade}/${p.uf}</td><td class="text-right">${fmt(p.volume)}</td><td class="text-right">R$ ${fmt(p.precoMedio)}</td><td class="text-right">R$ ${fmt(p.custo)}</td><td class="text-right" style="color:${p.economia>=0?'var(--success)':'var(--danger)'}">R$ ${fmt(p.economia)}</td><td class="text-center"><b><span style="color:${p.abc==='A'?'#10b981':(p.abc==='B'?'#f59e0b':'#ef4444')}">${p.abc}</span></b></td></tr>`;
                 });
             }
 
-            if(activeTab === 'tab-precos') {
+            if (activeTab === 'tab-precos') {
                 const tb = document.getElementById('tbPrecos'); tb.innerHTML = '';
                 const postosPreco = [...todosPostos].filter(p => p.volComTabela > 0).sort((a, b) => b.volume - a.volume);
 
                 postosPreco.forEach((p, i) => {
-                    const diff = p.divergenciaLitro; 
-                    const impacto = diff * p.volComTabela; 
-                    
+                    const diff = p.divergenciaLitro;
+                    const impacto = diff * p.volComTabela;
+
                     let statusHtml = '';
                     if (diff > 0.05) statusHtml = `<span class="badge red">🔴 Acima da Tabela</span>`;
                     else if (diff < -0.05) statusHtml = `<span class="badge green">🟢 Abaixo da Tabela</span>`;
@@ -795,74 +951,77 @@
                     </tr>`;
                 });
 
-                if(postosPreco.length === 0) {
+                if (postosPreco.length === 0) {
                     tb.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 40px; color:var(--text-muted); font-weight:bold;">Nenhum abastecimento encontrado que possua Preço de Tabela homologado no período selecionado.</td></tr>`;
                 }
             }
 
-            if(activeTab === 'tab-heatmap') {
+            if (activeTab === 'tab-heatmap') {
                 if (!mapInstance) {
                     mapInstance = L.map('heatmapMap', { zoomControl: false }).setView([-15.7, -47.9], 5);
                     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(mapInstance);
                     L.control.zoom({ position: 'topright' }).addTo(mapInstance);
                 }
-                
-                if(heatLayer) mapInstance.removeLayer(heatLayer);
-                if(markersLayer) mapInstance.removeLayer(markersLayer);
-                
+
+                if (heatLayer) mapInstance.removeLayer(heatLayer);
+                if (markersLayer) mapInstance.removeLayer(markersLayer);
+
                 const pts = []; markersLayer = L.layerGroup();
-                const termoBusca = document.getElementById('mapSearch').value.toUpperCase();
+                const termoBusca = (document.getElementById('mapSearch').value || '').toUpperCase();
                 const showA = document.getElementById('checkClasseA').checked;
                 const showB = document.getElementById('checkClasseB').checked;
                 const showC = document.getElementById('checkClasseC').checked;
 
                 todosPostos.forEach(p => {
-                    if(termoBusca && !p.posto.includes(termoBusca) && !p.cidade.includes(termoBusca)) return;
-                    if(p.abc === 'A' && !showA) return;
-                    if(p.abc === 'B' && !showB) return;
-                    if(p.abc === 'C' && !showC) return;
+                    const cidNorm = (p.cidade || '').toUpperCase();
+                    const postoNorm = (p.posto || '').toUpperCase();
+                    if (termoBusca && !postoNorm.includes(termoBusca) && !cidNorm.includes(termoBusca)) return;
+                    if (p.abc === 'A' && !showA) return;
+                    if (p.abc === 'B' && !showB) return;
+                    if (p.abc === 'C' && !showC) return;
 
                     let nomeCid = p.cidade ? p.cidade.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim() : '';
                     let baseCoord = coordsBrasil[nomeCid] || coordsEstados[p.uf] || { lat: -15.7, lng: -47.9 };
                     let hash = 0; let str = p.posto + nomeCid;
                     for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) % 10000;
                     let angle = (hash / 10000) * Math.PI * 2;
-                    let radius = 0.008 + ((hash % 100) / 100) * 0.04; 
-                    
+                    let radius = 0.008 + ((hash % 100) / 100) * 0.04;
+
                     let lat = baseCoord.lat + radius * Math.cos(angle);
                     let lng = baseCoord.lng + radius * Math.sin(angle);
-                    
+
                     pts.push([lat, lng, Math.min(1.0, Math.max(0.6, p.volume / 3000))]);
 
                     let corPino = p.abc === 'A' ? '#10b981' : (p.abc === 'B' ? '#f59e0b' : '#ef4444');
-                    const iconeSvg = L.divIcon({ className:'', html:`<svg width="22" height="30" viewBox="0 0 24 32"><path d="M12 0C5.372 0 0 5.372 0 12C0 21 12 32 12 32C12 32 24 21 24 12C24 5.372 18.627 0 12 0Z" fill="${corPino}"/><circle cx="12" cy="12" r="5" fill="#FFF"/></svg>`, iconSize:[22,30], iconAnchor:[11,30] });
-                    L.marker([lat, lng], {icon: iconeSvg}).bindPopup(`<b>${p.posto}</b><br>${p.cidade}/${p.uf}<br>Classe: <b>${p.abc}</b>`).addTo(markersLayer);
+                    const iconeSvg = L.divIcon({ className: '', html: `<svg width="22" height="30" viewBox="0 0 24 32"><path d="M12 0C5.372 0 0 5.372 0 12C0 21 12 32 12 32C12 32 24 21 24 12C24 5.372 18.627 0 12 0Z" fill="${corPino}"/><circle cx="12" cy="12" r="5" fill="#FFF"/></svg>`, iconSize: [22, 30], iconAnchor: [11, 30] });
+                    L.marker([lat, lng], { icon: iconeSvg }).bindPopup(`<b>${p.posto}</b><br>${p.cidade}/${p.uf}<br>Classe: <b>${p.abc}</b><br>Volume: ${fmt(p.volume)} L`).addTo(markersLayer);
                 });
-                
+
                 heatLayer = L.heatLayer(pts, { radius: 35, blur: 20, maxZoom: 10, minOpacity: 0.4, gradient: { 0.3: 'blue', 0.5: 'cyan', 0.7: 'lime', 0.9: 'yellow', 1.0: 'red' } });
-                if(document.getElementById('toggleHeatmapCheck').checked) heatLayer.addTo(mapInstance);
+                if (document.getElementById('toggleHeatmapCheck').checked) heatLayer.addTo(mapInstance);
                 markersLayer.addTo(mapInstance);
-                
-                if(pts.length > 0 && termoBusca) mapInstance.setView([pts[0][0], pts[0][1]], 10);
-                else if(pts.length > 0) mapInstance.fitBounds(pts.map(p => [p[0], p[1]]), { padding: [50, 50] });
+
+                if (pts.length > 0 && termoBusca) mapInstance.setView([pts[0][0], pts[0][1]], 10);
+                else if (pts.length > 0) mapInstance.fitBounds(pts.map(p => [p[0], p[1]]), { padding: [50, 50] });
             }
 
-            if(activeTab === 'tab-integration') {
+            if (activeTab === 'tab-integration') {
                 const tb = document.getElementById('tbInt'); tb.innerHTML = '';
-                const termo = document.getElementById('intSearchInput').value.toLowerCase();
-                
-                transacoesFiltradas.forEach(t => {
+                const termo = (document.getElementById('intSearchInput').value || '').toLowerCase();
+                const lista = transacoesFiltradas.slice(0, 500);
+
+                lista.forEach(t => {
                     const dtStr = t.data ? t.data.split(' ')[0].split('-').reverse().join('/') : 'ND';
                     const combTxt = t.combustivel || 'ND';
                     const rowText = `${dtStr} ${t.id} ${t.estabelecimento} ${t.cidade} ${t.uf} ${t.placa} ${t.motorista} ${t.status_nfe} ${t.cnpj_posto} ${t.chave_nfe} ${t.cnpj_cliente} ${combTxt}`.toLowerCase();
-                    
+
                     if (termo && !rowText.includes(termo)) return;
 
                     const cnpjEsperado = getCNPJEstruturado(t.uf, t.cidade, t.estabelecimento);
                     const cnpjRecebido = formatarCNPJ(t.cnpj_cliente || '');
                     const hasNfe = t.status_nfe === 'Vinculada';
                     let cnpjStatus = '<span class="badge warning" style="color:var(--warning); font-weight:normal">Aguardando NFe</span>';
-                    
+
                     if (hasNfe) {
                         if (cnpjRecebido === cnpjEsperado) {
                             cnpjStatus = `<span class="badge green">✅ CNPJ OK (${cnpjEsperado})</span>`;
@@ -871,7 +1030,7 @@
                         }
                     }
 
-                    const btnPdf = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}')">📄 Visualizar / Baixar PDF</a></div>` : '';
+                    const btnPdf = hasNfe && t.chave_nfe ? `<div class="nfe-links"><a href="#" class="btn-nfe alt" onclick="baixarNFePdf('${t.chave_nfe}');return false;">📄 Visualizar / Baixar PDF</a></div>` : '';
 
                     tb.innerHTML += `<tr>
                         <td>${dtStr}</td>
@@ -884,110 +1043,236 @@
                         <td><div class="status-box"><b><span style="color:${hasNfe?'var(--success)':'var(--danger)'}">${hasNfe?'✅ Vinculada':'⚠️ Pendente'}</span></b>${hasNfe ? `<small style="color:var(--text-muted)">${t.chave_nfe||''}</small>` : ''}<div>${cnpjStatus}</div>${btnPdf}</div></td>
                     </tr>`;
                 });
+
+                if (transacoesFiltradas.length > 500) {
+                    tb.innerHTML += `<tr><td colspan="8" class="text-center" style="padding:15px; color:var(--text-muted); font-weight:600; background:var(--bg-color);">Exibindo primeiros 500 registros de ${fmt(transacoesFiltradas.length)}. Use o filtro de busca para refinar.</td></tr>`;
+                }
             }
         }
-        
-        // --- 7. EVENT LISTENERS E INTEGRAÇÃO DE API ---
+
+        // ============================================================
+        // 7. MOTOR HÍBRIDO: API + CSV FALLBACK
+        // ============================================================
+        async function carregarViaAPI(dtIni, dtFim) {
+            if (!apiUrlAtual) throw new Error('URL da API não configurada');
+            const response = await fetch(`${apiUrlAtual}/api/dados?dtIni=${dtIni}&dtFim=${dtFim}`, { 
+                method: 'GET',
+                cache: 'no-cache'
+            });
+            if (!response.ok) throw new Error(`API HTTP ${response.status}`);
+            const res = await response.json();
+            return res.transacoes || [];
+        }
+
+        async function carregarViaCSV() {
+            const response = await fetch(CSV_FILENAME, { cache: 'no-cache' });
+            if (!response.ok) throw new Error(`Arquivo "${CSV_FILENAME}" não encontrado (HTTP ${response.status}).`);
+            const csvText = await response.text();
+            return parsearCSV(csvText);
+        }
+
+        // Carrega TUDO (para ter range de datas e base completa em memória)
+        async function carregarBaseCompleta() {
+            const status = document.getElementById('statusMsg');
+            status.innerHTML = '⏳ Carregando base de dados...';
+            status.className = 'status-msg loading';
+
+            // 1) Tentar API (se URL configurada) — pega range histórico completo
+            if (apiUrlAtual) {
+                try {
+                    const dataInicio = '2020-01-01';
+                    const d = new Date(); d.setDate(d.getDate() - 1);
+                    const dataFim = d.toISOString().substring(0, 10);
+                    
+                    const trans = await carregarViaAPI(dataInicio, dataFim);
+                    if (trans.length > 0) {
+                        todasTransacoes = trans;
+                        setSourceBadge('api', '🌐 API Ativa');
+                        finalizarCarga();
+                        showToast(`✅ ${fmt(trans.length)} transações carregadas da API.`, 'success');
+                        return;
+                    }
+                    console.warn('API retornou 0 registros. Tentando CSV...');
+                } catch (err) {
+                    console.warn('API falhou:', err.message, '— usando CSV fallback.');
+                    setSourceBadge('csv', '📁 CSV Local');
+                }
+            }
+
+            // 2) Fallback CSV
+            try {
+                const trans = await carregarViaCSV();
+                if (trans.length === 0) throw new Error('CSV vazio ou inválido');
+                todasTransacoes = trans;
+                setSourceBadge('csv', '📁 CSV Local');
+                finalizarCarga();
+                showToast(`✅ ${fmt(trans.length)} transações carregadas do CSV.`, 'success');
+            } catch (err) {
+                console.error(err);
+                setSourceBadge('off', '❌ Offline');
+                status.innerHTML = `❌ ${err.message}`;
+                status.className = 'status-msg error';
+                showToast(err.message, 'error');
+            }
+        }
+
+        function finalizarCarga() {
+            // Detecta range completo e define datas default
+            const datas = todasTransacoes.map(t => (t.data || '').split(' ')[0]).filter(d => d && d.length === 10).sort();
+            if (datas.length === 0) return;
+            const minData = datas[0];
+            const maxData = datas[datas.length - 1];
+
+            const inputIni = document.getElementById('dataInicio');
+            const inputFim = document.getElementById('dataFim');
+            if (!inputIni.value || inputIni.value < minData || inputIni.value > maxData) inputIni.value = minData;
+            if (!inputFim.value || inputFim.value > maxData || inputFim.value < minData) inputFim.value = maxData;
+
+            baseCarregada = true;
+            aplicarFiltroPeriodo();
+
+            const status = document.getElementById('statusMsg');
+            status.innerHTML = `✅ ${transacoesGlobais.length} registros | ${minData} → ${maxData}`;
+            status.className = 'status-msg success';
+
+            // Ativa primeira aba permitida
+            const primeiraAbaPermitida = document.querySelector('.nav-tab[style*="block"]');
+            if (primeiraAbaPermitida) primeiraAbaPermitida.click();
+        }
+
+        function aplicarFiltroPeriodo() {
+            if (!baseCarregada) return;
+            const dates = getDatasFiltro();
+            if (!dates.dtIni || !dates.dtFim) { showToast('Defina o período.', 'warning'); return; }
+
+            transacoesGlobais = todasTransacoes.filter(t => {
+                const d = (t.data || '').split(' ')[0];
+                return d >= dates.dtIni && d <= dates.dtFim;
+            });
+
+            const status = document.getElementById('statusMsg');
+            if (transacoesGlobais.length === 0) {
+                status.innerHTML = '⚠️ Banco Vazio no Período';
+                status.className = 'status-msg warning';
+                document.getElementById('kpiGrid').innerHTML = '';
+                showToast('Não foram encontradas transações neste intervalo.', 'warning');
+                return;
+            }
+
+            processarDados();
+            if (document.querySelector('.nav-tab.active')) renderTabContent();
+        }
+
+        // Aciona o robô da TruckPag no backend
+        async function acionarRoboTruckPag() {
+            if (!apiUrlAtual) {
+                showToast('Configure a URL do Backend em ⚙️ Layout primeiro.', 'warning');
+                return;
+            }
+            const dates = getDatasFiltro();
+            const btn = document.getElementById('btnSyncApi');
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Sincronizando...';
+
+            try {
+                const response = await fetch(`${apiUrlAtual}/api/forcar-sync-background`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dtIni: dates.dtIni, dtFim: dates.dtFim })
+                });
+                const res = await response.json();
+                showToast(res.message || 'Sincronização iniciada!', 'success');
+                
+                // Aguarda 8s e recarrega
+                setTimeout(async () => {
+                    showToast('Recarregando dados...', 'success');
+                    await carregarBaseCompleta();
+                    btn.disabled = false;
+                    btn.innerHTML = '⬇️ Nuvem TruckPag';
+                }, 8000);
+            } catch (e) {
+                showToast('O Servidor falhou em acionar a TruckPag.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '⬇️ Nuvem TruckPag';
+            }
+        }
+
+        // ============================================================
+        // 8. EVENT LISTENERS
+        // ============================================================
         document.getElementById('navTabs').addEventListener('click', e => {
-            const b = e.target.closest('.nav-tab'); if(!b) return;
+            const b = e.target.closest('.nav-tab'); if (!b) return;
             document.querySelectorAll('.nav-tab, .tab-content').forEach(el => el.classList.remove('active'));
             b.classList.add('active'); document.getElementById(b.dataset.tab).classList.add('active');
-            setTimeout(renderTabContent, 50); 
+            setTimeout(renderTabContent, 50);
         });
 
         document.getElementById('intSearchInput').addEventListener('input', renderTabContent);
-        document.getElementById('mapSearch').addEventListener('input', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('mapSearch').addEventListener('input', () => { if (document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
         document.getElementById('toggleHeatmapCheck').addEventListener('change', (e) => { if (!mapInstance || !heatLayer) return; if (e.target.checked) mapInstance.addLayer(heatLayer); else mapInstance.removeLayer(heatLayer); });
-        document.getElementById('checkClasseA').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
-        document.getElementById('checkClasseB').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
-        document.getElementById('checkClasseC').addEventListener('change', () => { if(document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseA').addEventListener('change', () => { if (document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseB').addEventListener('change', () => { if (document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
+        document.getElementById('checkClasseC').addEventListener('change', () => { if (document.querySelector('.nav-tab.active')?.dataset.tab === 'tab-heatmap') renderTabContent(); });
 
-        async function fetchAPILocal() {
-            const status = document.getElementById('statusMsg');
-            const dates = getDatasFiltro();
-            status.innerHTML = 'Processando...'; status.className = 'status-msg';
-
-            try {
-                const BASE_API = apiUrlAtual || 'http://localhost:3000';
-                const response = await fetch(`${BASE_API}/api/dados?dtIni=${dates.dtIni}&dtFim=${dates.dtFim}`);
-                const res = await response.json();
-                transacoesGlobais = res.transacoes || [];
-                
-                if(transacoesGlobais.length === 0) {
-                    status.innerHTML = '⚠️ Banco Vazio no Período'; status.className = 'status-msg warning'; document.getElementById('kpiGrid').innerHTML = '';
-                    showToast('Não foram encontradas notas fiscais neste intervalo de datas.', 'warning');
-                } else {
-                    processarDados(); 
-                    if(document.querySelector('.nav-tab.active')) renderTabContent(); 
-                    showToast('Dados consolidados com sucesso.', 'success');
-                }
-            } catch (e) {
-                status.innerHTML = `❌ Servidor Inativo.`; status.className = 'status-msg error';
-                showToast('Falha ao conectar no Backend (API Offline).', 'error');
-            }
-        }
-
-        async function acionarRoboTruckPag() {
-            const dates = getDatasFiltro();
-            const BASE_API = apiUrlAtual || 'http://localhost:3000';
-            
-            try {
-                showToast('Enviando comando para o servidor...', 'success');
-                const response = await fetch(`${BASE_API}/api/forcar-sync-background`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dates)
-                });
-                const res = await response.json();
-                showToast(res.message, 'success');
-            } catch(e) {
-                showToast('O Servidor falhou em acionar a TruckPag.', 'error');
-            }
-        }
-
-        document.getElementById('btnConectar').addEventListener('click', fetchAPILocal);
-        document.getElementById('btnRecarregarTela').addEventListener('click', () => {
-            const tb = document.getElementById('tbInt'); if(tb) tb.innerHTML = '';
-            fetchAPILocal();
+        document.getElementById('btnConectar').addEventListener('click', () => {
+            if (!baseCarregada) carregarBaseCompleta();
+            else { aplicarFiltroPeriodo(); showToast('Filtro aplicado.', 'success'); }
         });
+
+        document.getElementById('btnRecarregarTela').addEventListener('click', () => {
+            const tb = document.getElementById('tbInt'); if (tb) tb.innerHTML = '';
+            carregarBaseCompleta();
+        });
+
         document.getElementById('btnSyncApi').addEventListener('click', acionarRoboTruckPag);
         document.getElementById('btnExportCSV').addEventListener('click', exportarCSV);
-        document.getElementById('filtroTipoAbast').addEventListener('change', () => { if(transacoesGlobais.length>0){ processarDados(); renderTabContent(); } });
+        document.getElementById('filtroTipoAbast').addEventListener('change', () => { if (transacoesGlobais.length > 0) { processarDados(); renderTabContent(); } });
 
+        // ============================================================
+        // 9. INICIALIZAÇÃO
+        // ============================================================
         window.onload = async () => {
             await initDBUsuarios();
             preencherAnos();
-            const d = new Date(); 
-            document.getElementById('dataInicio').value = document.getElementById('dataFim').value = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-            
+
+            const d = new Date();
+            const hoje = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+            document.getElementById('dataInicio').value = hoje;
+            document.getElementById('dataFim').value = hoje;
+
             const user = sessionStorage.getItem('logged_user');
-            if(user) {
+            if (user) {
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('loggedUserTag').innerHTML = `👤 ${user}`;
-                
-                document.getElementById('btnOpenAdmin').addEventListener('click', () => document.getElementById('adminModal').style.display='flex');
-                
+
+                document.getElementById('btnOpenAdmin').addEventListener('click', () => document.getElementById('adminModal').style.display = 'flex');
+
                 document.getElementById('btnOpenSettings').addEventListener('click', () => {
-                    document.getElementById('cfgApiUrl').value = apiUrlAtual; 
+                    document.getElementById('cfgApiUrl').value = apiUrlAtual;
                     document.getElementById('settingsModal').style.display = 'flex';
                 });
 
-                const perms = JSON.parse(sessionStorage.getItem('user_perms'));
-                if(perms.overview) document.getElementById('btn_t_overview').style.display = 'block';
-                if(perms.temporal) document.getElementById('btn_t_temporal').style.display = 'block';
-                if(perms.abc) document.getElementById('btn_t_abc').style.display = 'block';
-                if(perms.precos) document.getElementById('btn_t_precos').style.display = 'block';
-                if(perms.heatmap) document.getElementById('btn_t_heatmap').style.display = 'block';
-                if(perms.integration) document.getElementById('btn_t_integration').style.display = 'block';
-                if(user === MASTER_ADMIN) document.getElementById('btnOpenAdmin').style.display = 'block';
-                
-                const primeiraAbaPermitida = document.querySelector('.nav-tab[style*="block"]');
-                if (primeiraAbaPermitida) primeiraAbaPermitida.click();
+                const perms = JSON.parse(sessionStorage.getItem('user_perms') || '{}');
+                if (perms.overview) document.getElementById('btn_t_overview').style.display = 'block';
+                if (perms.temporal) document.getElementById('btn_t_temporal').style.display = 'block';
+                if (perms.abc) document.getElementById('btn_t_abc').style.display = 'block';
+                if (perms.precos) document.getElementById('btn_t_precos').style.display = 'block';
+                if (perms.heatmap) document.getElementById('btn_t_heatmap').style.display = 'block';
+                if (perms.integration) document.getElementById('btn_t_integration').style.display = 'block';
+                if (user === MASTER_ADMIN) document.getElementById('btnOpenAdmin').style.display = 'block';
+
+                // Carrega base híbrida (API → CSV fallback)
+                await carregarBaseCompleta();
             }
         };
 
+        // ============================================================
+        // 10. TEMA CLARO / ESCURO
+        // ============================================================
         let isDark = false;
         document.getElementById('themeToggle').addEventListener('click', () => {
             isDark = !isDark; document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-            if(document.querySelector('.nav-tab.active')) renderTabContent();
+            if (document.querySelector('.nav-tab.active')) renderTabContent();
         });
     </script>
 </body>
