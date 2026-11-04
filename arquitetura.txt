@@ -1,0 +1,56 @@
+cavalheirolog/
+│
+├── .env                                  # Variáveis de ambiente locais (Porta, Credenciais TruckPag)
+├── package.json                          # Dependências e scripts ajustados para a nova estrutura
+├── banco_cavalheiro.sqlite               # Banco de dados SQLite local (mantido na raiz para não quebrar caminhos)
+├── csv_historico/                        # Pasta para leitura automática dos CSVs da TruckPag
+├── backups_sqlite/                       # Pasta gerada automaticamente pelo Cron de backup diário
+│
+├── src/                                  # [BACKEND] Código-fonte modularizado do servidor Node.js
+│   ├── config/
+│   │   ├── database.js                   # Conexão SQLite (WAL mode), wrappers Promise (dbRun, dbAll, dbGet) e init das tabelas
+│   │   └── constants.js                  # CONFIG_PADRAO_SISTEMA, Alíquotas ICMS por UF e Dicionário Geográfico de Municípios/UFs
+│   │
+│   ├── utils/
+│   │   ├── helpers.js                    # Matemática exata (toMl, toCents), datas Brasil, parseTruckPagNum, CNPJ, SHA256 e normalização
+│   │   ├── businessRules.js              # Regras fiscais: obterCNPJEstruturado (73/88/20), inspecionarChaveNFe (Mód. 11), redes, bombas e hodômetro
+│   │   └── geoResolver.js                # Motor de geolocalização de postos/cidades (resolverCoordenadaPosto e normalizarUf)
+│   │
+│   ├── services/
+│   │   ├── truckpagService.js            # Integração API TruckPag (auth, cache de token, fetchComRetentativa, baixarUnicoDia)
+│   │   ├── syncService.js                # Smart Sync (filaSync, _executarSync, filtro de estornos/manuais e cacaNotasPendentes)
+│   │   ├── csvService.js                 # Motor universal dos 3 relatórios CSV TruckPag, auto-conciliação local e sanearBaseExistente
+│   │   ├── priceService.js               # Motor de cruzamento de preços (encontrarAcordoCompleto e aplicarPrecosNegociadosNoBanco)
+│   │   └── biAnalyticsService.js         # Motor de BI (construirAnaliseCompleta, cálculos de economia, Km/L e alertas operacionais)
+│   │
+│   ├── controllers/
+│   │   ├── analiseController.js          # Lógica da rota GET /api/dados
+│   │   ├── auditoriaController.js        # Lógica das rotas GET /api/auditoria, POST /api/buscar-auditoria, POST /api/forcar-sync-background e POST /api/conciliar-csv
+│   │   ├── precosController.js           # Lógica de GET/POST/DELETE /api/precos-negociados e GET /api/relatorio-glosa
+│   │   └── sistemaController.js          # Lógica de /api/configuracoes, /api/usuarios, /api/frota-parametros e /api/status-sistema
+│   │
+│   ├── routes/
+│   │   └── apiRoutes.js                  # Roteador central do Express mapeando todos os endpoints /api/*
+│   │
+│   ├── jobs/
+│   │   └── cronJobs.js                   # Agendamentos node-cron (Radar 10m, Fechamento Diário, Caçador NFe 1h e Backup 03h)
+│   │
+│   └── app.js                            # Configuração do Express (CORS, JSON 35mb, pasta estática 'public/' e montagem das rotas)
+│
+├── public/                               # [FRONTEND] Arquivos estáticos servidos no localhost:3000
+│   ├── index.html                        # Estrutura HTML limpa (Modais, Sidebar, Abas e Containers)
+│   ├── css/
+│   │   └── styles.css                    # Todos os estilos, variáveis de temas (Dark/Light), densidades de tabela e responsividade
+│   └── js/
+│       ├── state.js                      # Estado global, configurações padrão, dicionário geográfico de fallback e utilitários front (fmt, toast, CNPJ)
+│       ├── auth.js                       # Controle de sessão, SHA-256 no navegador, login e cadastro de usuários/permissões
+│       ├── settings.js                   # Personalização de layout, temas, presets de cores e modal de diagnóstico (Status API)
+│       ├── chartsMap.js                  # Renderização dinâmica do Chart.js (8 formatos), Simulador What-If e Mapa Leaflet + Heatmap
+│       ├── precos.js                     # Gestão de acordos comerciais, matriz de viabilidade, importação CSV e exportação de glosa
+│       ├── auditoria.js                  # Motor independente da aba Auditoria NFe & Compliance ICMS e exportações CSV
+│       └── main.js                       # Inicialização (window.onload), controle de abas, filtros da sidebar e comunicação com o Backend
+│
+├── scripts/
+│   └── importador.js                     # Script CLI independente para importação em lote via terminal (npm run importar)
+│
+└── server.js                             # Entrypoint enxuto na raiz: inicializa o banco, ativa os Crons e sobe o servidor na porta 3000

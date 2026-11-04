@@ -1,0 +1,22 @@
+{
+  "name": "backend-cavalheirolog",
+  "version": "3.0.0",
+  "description": "Plataforma Corporativa CavalheiroLog - Auditoria Fiscal, Volumetria, Telemetria Km/L e Economia Real",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "importar": "node importador.js"
+  },
+  "keywords": ["truckpag", "cavalheirolog", "combustivel", "auditoria", "telemetria", "icms"],
+  "author": "CavalheiroLog",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.20.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "node-cron": "^4.6.0",
+    "sqlite3": "^6.0.1"
+  }
+}

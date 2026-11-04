@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  cavaleiro-npm:
+    build: .
+    container_name: cavaleiro-npm-app
+    ports:
+      - "80:3000" # Mapeia a porta 80 do servidor para a porta 3000 do contêiner
+    volumes:
+      - sqlite_data:/app/data # Salva o banco SQLite fora do contêiner
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: always # Reinicia automaticamente se o servidor cair
+
+volumes:
+  sqlite_data:
